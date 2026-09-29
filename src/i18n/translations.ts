@@ -3,7 +3,7 @@ export type Lang = 'en' | 'ta';
 export const translations = {
   en: {
     // App
-    appName: 'SDG10 Assistant',
+    appName: 'SAMAM AI',
     appTagline: 'Reducing Inequalities through Education & Opportunity',
     // Nav
     navHome: 'Home',
@@ -152,7 +152,7 @@ export const translations = {
   },
   ta: {
     // App
-    appName: 'SDG10 உதவியாளர்',
+    appName: 'SAMAM AI உதவியாளர்',
     appTagline: 'கல்வி மற்றும் வாய்ப்பு மூலம் ஏற்றத்தாழ்வைக் குறைத்தல்',
     // Nav
     navHome: 'முகப்பு',
