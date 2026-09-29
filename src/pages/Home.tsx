@@ -1,102 +1,129 @@
-import { GraduationCap, BookOpen, Wrench, Briefcase, ArrowRight, Scale, Globe, Mic, ShieldCheck } from 'lucide-react';
+import { GraduationCap, BookOpen, Wrench, Briefcase, ArrowRight, Sparkles, Globe2, Mic, ShieldCheck, Search, MessageCircle, ChevronRight } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import type { Page } from '@/components/Navbar';
 
-interface HomeProps {
-  lang: Lang;
-  setPage: (p: Page) => void;
-}
+interface HomeProps { lang: Lang; setPage: (p: Page) => void; }
 
 export function Home({ lang, setPage }: HomeProps) {
   const features = [
-    { id: 'scholarships' as Page, icon: GraduationCap, title: t(lang, 'homeFeature1'), desc: t(lang, 'homeFeature1Desc'), color: 'from-sdg-blue to-sdg-blue-light', delay: '0s' },
-    { id: 'tnea' as Page, icon: BookOpen, title: t(lang, 'homeFeature2'), desc: t(lang, 'homeFeature2Desc'), color: 'from-sdg-teal to-sdg-teal-light', delay: '0.1s' },
-    { id: 'skills' as Page, icon: Wrench, title: t(lang, 'homeFeature3'), desc: t(lang, 'homeFeature3Desc'), color: 'from-sdg-orange to-sdg-orange-light', delay: '0.2s' },
-    { id: 'jobs' as Page, icon: Briefcase, title: t(lang, 'homeFeature4'), desc: t(lang, 'homeFeature4Desc'), color: 'from-sdg-blue-dark to-sdg-teal', delay: '0.3s' },
+    { id: 'scholarships' as Page, icon: GraduationCap, title: t(lang, 'homeFeature1'), desc: t(lang, 'homeFeature1Desc'), accent: 'from-violet-500 to-fuchsia-500' },
+    { id: 'tnea' as Page, icon: BookOpen, title: t(lang, 'homeFeature2'), desc: t(lang, 'homeFeature2Desc'), accent: 'from-cyan-400 to-blue-500' },
+    { id: 'skills' as Page, icon: Wrench, title: t(lang, 'homeFeature3'), desc: t(lang, 'homeFeature3Desc'), accent: 'from-emerald-400 to-cyan-500' },
+    { id: 'jobs' as Page, icon: Briefcase, title: t(lang, 'homeFeature4'), desc: t(lang, 'homeFeature4Desc'), accent: 'from-pink-500 to-violet-500' },
   ];
 
   return (
-    <div className="space-y-12">
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sdg-blue via-sdg-blue-light to-sdg-teal py-16 px-6 md:py-24 md:px-12">
-        <div className="absolute inset-0 bg-wave-pattern bg-cover bg-bottom opacity-30" />
-        <div className="absolute top-0 right-0 w-72 h-72 bg-sdg-orange/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-sdg-teal/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+    <div className="relative -mx-4 sm:-mx-6 overflow-hidden rounded-b-[2rem] bg-[#060b1a] text-white">
+      <div className="absolute inset-0 samam-grid opacity-40" />
+      <div className="absolute -top-40 -right-20 w-[30rem] h-[30rem] rounded-full bg-violet-600/20 blur-3xl samam-float" />
+      <div className="absolute top-80 -left-40 w-[28rem] h-[28rem] rounded-full bg-cyan-500/15 blur-3xl samam-float" style={{ animationDelay: '1.2s' }} />
 
-        <div className="relative max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 mb-6 animate-fade-in-down">
-            <Scale size={16} className="text-white" />
-            <span className="text-white text-sm font-medium">SDG 10 — Reduced Inequalities</span>
+      <section className="relative px-5 sm:px-10 lg:px-16 pt-12 pb-16 md:pt-20 md:pb-24">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.15fr_.85fr] gap-12 items-center">
+          <div className="animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/5 ring-1 ring-cyan-300/20 text-cyan-200 text-xs font-semibold mb-6">
+              <Sparkles size={14} /> AI-POWERED • EQUAL ACCESS
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.02]">
+              {lang === 'ta' ? 'அனைவருக்கும் சமமான அணுகல்.' : 'Equal access.'}
+              <span className="block bg-gradient-to-r from-cyan-300 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                {lang === 'ta' ? 'சமமான வாய்ப்புகள்.' : 'Smarter opportunities.'}
+              </span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-base sm:text-lg leading-8 text-slate-300">
+              {lang === 'ta' ? 'உதவித்தொகைகள், கல்வி, திறன்கள் மற்றும் வேலை வாய்ப்புகளை ஒரே இடத்தில் கண்டறிய SAMAM AI உங்களுக்கு உதவுகிறது.' : 'SAMAM AI brings scholarships, education guidance, skills and opportunities together in one simple place.'}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button onClick={() => setPage('scholarships')} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-950 font-bold hover:scale-[1.03] transition-all shadow-xl">
+                Explore opportunities <ArrowRight size={18} />
+              </button>
+              <button onClick={() => setPage('about')} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 ring-1 ring-white/15 text-white font-semibold hover:bg-white/10 transition-all">
+                <MessageCircle size={18} /> How SAMAM works
+              </button>
+            </div>
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-400">
+              <span className="inline-flex items-center gap-1.5"><Globe2 size={14} className="text-cyan-300" /> Tamil + English</span>
+              <span className="inline-flex items-center gap-1.5"><Mic size={14} className="text-violet-300" /> Voice ready</span>
+              <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-emerald-300" /> Official sources</span>
+            </div>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            {t(lang, 'homeHeroTitle')}
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            {t(lang, 'homeHeroSub')}
-          </p>
-          <button
-            onClick={() => setPage('scholarships')}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-sdg-blue font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 animate-fade-in-up"
-            style={{ animationDelay: '0.3s' }}
-          >
-            {t(lang, 'homeHeroCta')}
-            <ArrowRight size={20} />
-          </button>
+
+          <div className="relative flex justify-center animate-scale-in">
+            <div className="absolute w-72 h-72 rounded-full bg-violet-500/20 blur-3xl" />
+            <div className="samam-orb relative w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-br from-cyan-300/20 via-violet-500/20 to-fuchsia-500/20 ring-1 ring-cyan-200/20 flex items-center justify-center">
+              <div className="absolute inset-5 rounded-full border border-cyan-200/20" />
+              <div className="absolute inset-12 rounded-full border border-violet-300/20" />
+              <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-full bg-gradient-to-br from-violet-600 via-blue-600 to-cyan-400 shadow-[0_0_80px_rgba(99,102,241,.45)] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-6xl sm:text-7xl font-black text-white">S</div>
+                  <div className="text-[10px] tracking-[.3em] font-bold text-cyan-100">SAMAM AI</div>
+                </div>
+              </div>
+              <div className="absolute -right-2 top-12 px-4 py-2 rounded-2xl bg-slate-900/90 ring-1 ring-cyan-300/20 shadow-xl text-xs">
+                <span className="text-cyan-300 font-bold">Arthur</span><br />
+                <span className="text-slate-400">AI Assistant</span>
+              </div>
+              <div className="absolute -left-3 bottom-14 px-4 py-2 rounded-2xl bg-slate-900/90 ring-1 ring-violet-300/20 shadow-xl text-xs">
+                <span className="text-violet-300 font-bold">24/7</span><br />
+                <span className="text-slate-400">Guidance</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Feature cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {features.map((f) => {
-          const Icon = f.icon;
-          return (
-            <button
-              key={f.id}
-              onClick={() => setPage(f.id)}
-              className="card p-6 text-left group hover:scale-[1.02] animate-fade-in-up"
-              style={{ animationDelay: f.delay }}
-            >
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                <Icon size={28} className="text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-ink-800 mb-2">{f.title}</h3>
-              <p className="text-ink-500 text-sm leading-relaxed">{f.desc}</p>
-              <div className="flex items-center gap-1 mt-4 text-sdg-blue font-medium text-sm group-hover:gap-2 transition-all">
-                {t(lang, 'viewDetails')}
-                <ArrowRight size={16} />
-              </div>
-            </button>
-          );
-        })}
+      <section className="relative px-5 sm:px-10 lg:px-16 pb-14">
+        <div className="max-w-6xl mx-auto grid sm:grid-cols-3 gap-3">
+          {[
+            { icon: Search, value: '01', label: 'Discover', desc: 'Find relevant schemes and resources' },
+            { icon: MessageCircle, value: '02', label: 'Ask Arthur', desc: 'Get simple AI guidance' },
+            { icon: ShieldCheck, value: '03', label: 'Verify & act', desc: 'Use official links to apply' },
+          ].map((item) => {
+            const Icon = item.icon;
+            return <div key={item.value} className="interactive-card rounded-2xl bg-white/[.04] ring-1 ring-white/10 p-5">
+              <div className="flex items-center justify-between mb-5"><Icon size={21} className="text-cyan-300" /><span className="text-xs font-bold text-slate-500">{item.value}</span></div>
+              <h3 className="font-bold text-lg">{item.label}</h3>
+              <p className="text-sm text-slate-400 mt-1">{item.desc}</p>
+            </div>;
+          })}
+        </div>
       </section>
 
-      {/* Highlights */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { icon: Globe, title: 'Tamil + English', desc: 'Bilingual interface' },
-          { icon: Mic, title: 'Voice Support', desc: 'Speak & listen' },
-          { icon: ShieldCheck, title: 'Verified Links', desc: 'Official sources only' },
-        ].map((h, i) => {
-          const Icon = h.icon;
-          return (
-            <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-white border border-ink-200 animate-fade-in" style={{ animationDelay: `${0.4 + i * 0.1}s` }}>
-              <div className="w-10 h-10 rounded-xl bg-sdg-teal/10 flex items-center justify-center flex-shrink-0">
-                <Icon size={20} className="text-sdg-teal-dark" />
-              </div>
-              <div>
-                <p className="font-semibold text-ink-800 text-sm">{h.title}</p>
-                <p className="text-ink-500 text-xs">{h.desc}</p>
-              </div>
+      <section className="relative px-5 sm:px-10 lg:px-16 py-16 bg-white/[.02]">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-4 mb-8">
+            <div>
+              <p className="text-xs font-bold tracking-[.2em] text-cyan-300 uppercase">One platform</p>
+              <h2 className="text-3xl sm:text-4xl font-black mt-2">Everything you need to move forward.</h2>
             </div>
-          );
-        })}
+            <button onClick={() => setPage('faqs')} className="hidden sm:flex items-center gap-1 text-sm text-slate-300 hover:text-white">FAQs <ChevronRight size={16}/></button>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {features.map((f) => {
+              const Icon = f.icon;
+              return <button key={f.id} onClick={() => setPage(f.id)} className="interactive-card text-left rounded-2xl bg-white/[.045] ring-1 ring-white/10 p-6 hover:bg-white/[.07] group">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.accent} flex items-center justify-center shadow-lg mb-5 group-hover:scale-110 transition-transform`}><Icon size={23} className="text-white" /></div>
+                <h3 className="text-xl font-bold">{f.title}</h3>
+                <p className="text-sm leading-6 text-slate-400 mt-2 max-w-lg">{f.desc}</p>
+                <span className="inline-flex items-center gap-1 mt-5 text-sm font-semibold text-cyan-300">Open module <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform"/></span>
+              </button>;
+            })}
+          </div>
+        </div>
       </section>
 
-      {/* Disclaimer */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-sdg-orange/5 border border-sdg-orange/20">
-        <ShieldCheck size={20} className="text-sdg-orange flex-shrink-0 mt-0.5" />
-        <p className="text-sm text-ink-600">{t(lang, 'verifyNote')}</p>
-      </div>
+      <section className="relative px-5 sm:px-10 lg:px-16 py-14">
+        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-violet-600/20 via-blue-600/10 to-cyan-500/20 ring-1 ring-white/10 p-7 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <p className="text-xs font-bold tracking-[.2em] text-violet-300 uppercase">Meet your assistant</p>
+            <h2 className="text-2xl sm:text-3xl font-black mt-2">Ask Arthur in English or Tamil.</h2>
+            <p className="text-slate-400 mt-2 max-w-xl">Get guided answers about scholarships, TNEA, skills and jobs without searching through multiple websites.</p>
+          </div>
+          <button onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold shadow-lg hover:scale-[1.03] transition-all">
+            <Sparkles size={18}/> Chat with Arthur
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
