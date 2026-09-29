@@ -23,6 +23,12 @@ function App() {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  useEffect(() => {
+    const openArthur = () => setArthurOpen(true);
+    document.addEventListener('open-arthur', openArthur);
+    return () => document.removeEventListener('open-arthur', openArthur);
+  }, []);
+
   const handleTranscript = (text: string) => {
     // Simple response: acknowledge the query and suggest relevant page
     const lower = text.toLowerCase();
@@ -69,7 +75,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-50" lang={lang}>
+    <div className="min-h-screen bg-[#060b1a]" lang={lang}>
       <Navbar lang={lang} setLang={setLang} page={page} setPage={setPage} onArthur={() => setArthurOpen(true)} />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
@@ -90,8 +96,8 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-ink-200 bg-white mt-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <footer className="border-t border-white/10 bg-[#050816] mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex items-start gap-3 p-4 rounded-xl bg-sdg-orange/5 border border-sdg-orange/20 mb-6">
             <ShieldCheck size={20} className="text-sdg-orange flex-shrink-0 mt-0.5" />
             <p className="text-sm text-ink-600">{t(lang, 'verifyNote')}</p>
@@ -102,8 +108,8 @@ function App() {
                 <span className="text-white font-bold text-xs">10</span>
               </div>
               <div>
-                <p className="font-bold text-ink-800 text-sm">SDG 10 Assistant</p>
-                <p className="text-xs text-ink-500">Reducing Inequalities — Tamil Nadu</p>
+                <p className="font-bold text-white text-sm">SAMAM AI</p>
+                <p className="text-xs text-slate-400">Equal Access • Stronger Communities</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-3 text-sm">
@@ -113,8 +119,8 @@ function App() {
               <a href="https://swayam.gov.in" target="_blank" rel="noopener noreferrer" className="text-sdg-blue hover:underline">SWAYAM</a>
             </div>
           </div>
-          <p className="text-center text-xs text-ink-400 mt-6">
-            Built for SDG 10 — Reduced Inequalities. Always verify on official government websites.
+          <p className="text-center text-xs text-slate-500 mt-6">
+            SAMAM AI • Built for SDG 10 — Reduced Inequalities • Always verify on official government websites.
           </p>
         </div>
       </footer>
