@@ -19,7 +19,7 @@ export function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
       </div>
       <div className="flex flex-col leading-none">
         <span className={`${dims.text} font-extrabold bg-gradient-to-r from-sdg-blue to-sdg-teal bg-clip-text text-transparent`}>
-          SDG10
+          SAMAM AI
         </span>
         <span className="text-[10px] font-medium text-ink-500 tracking-wide">ASSISTANT</span>
       </div>
