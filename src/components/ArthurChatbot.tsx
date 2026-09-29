@@ -29,9 +29,10 @@ interface ChatMessage {
 function ElephantAvatar({ size = 40 }: { size?: number }) {
   return (
     <div
-      className="rounded-full bg-gradient-to-br from-sdg-blue to-sdg-teal flex items-center justify-center flex-shrink-0 shadow-md"
+      className="relative rounded-full bg-gradient-to-br from-violet-600 via-sdg-blue to-cyan-400 flex items-center justify-center flex-shrink-0 shadow-lg samam-orb overflow-hidden"
       style={{ width: size, height: size }}
     >
+      <span className="absolute inset-0 rounded-full bg-cyan-300/30 blur-md samam-glow" />
       <svg viewBox="0 0 64 64" width={size * 0.6} height={size * 0.6} fill="white">
         <path d="M20 14c-6 0-11 5-11 12 0 4 2 7 4 9v8c0 3 2 5 5 5h2v-6h4v6h4v-6h4v6h2c3 0 5-2 5-5v-8c2-2 4-5 4-9 0-7-5-12-11-12-1-2-3-3-6-3s-5 1-6 3z" />
         <circle cx="15" cy="24" r="2.5" fill="#0F4C81" />
@@ -188,7 +189,7 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 bg-gradient-to-br from-sdg-blue to-sdg-teal text-white px-4 py-3 rounded-2xl shadow-xl shadow-sdg-blue/30 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 animate-fade-in"
+          className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 bg-gradient-to-br from-slate-950 via-sdg-blue-dark to-violet-700 text-white px-4 py-3 rounded-2xl shadow-xl shadow-sdg-blue/30 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 animate-fade-in"
           aria-label={t(chatLang, 'arthurChatWith')}
         >
           <ElephantAvatar size={36} />
@@ -201,11 +202,11 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
         <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-96 max-w-full animate-slide-in-right">
           <div className="flex flex-col bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-ink-200 overflow-hidden" style={{ height: 'min(600px, 85vh)' }}>
             {/* Header */}
-            <div className="flex items-center justify-between bg-gradient-to-r from-sdg-blue to-sdg-teal px-4 py-3 flex-shrink-0">
+            <div className="flex items-center justify-between bg-gradient-to-r from-slate-950 via-sdg-blue-dark to-violet-700 px-4 py-3 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <ElephantAvatar size={40} />
                 <div>
-                  <p className="font-bold text-white text-sm leading-none">{t(chatLang, 'arthurName')}</p>
+                  <p className="font-bold text-white text-sm leading-none">{t(chatLang, 'arthurName') || 'Arthur'}</p>
                   <p className="text-white/80 text-xs mt-0.5">{t(chatLang, 'arthurSubtitle')}</p>
                 </div>
               </div>
