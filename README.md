@@ -1,4 +1,4 @@
-# SDG10 Assistant — Reducing Inequalities
+# SAMAM AI — Reducing Inequalities
 
 A bilingual (Tamil + English) AI voice/chat assistant web app for **SDG 10 (Reduced Inequalities)** that helps students and workers in Tamil Nadu access scholarships, TNEA counselling, skill development, and job opportunities.
 
@@ -17,7 +17,7 @@ A bilingual (Tamil + English) AI voice/chat assistant web app for **SDG 10 (Redu
 ## Tech Stack
 
 - **React** + **Vite** + **TypeScript**
-- **Tailwind CSS** with custom SDG10 theme (Deep Blue #0F4C81, Teal #20B2AA, Orange #FF6F3C)
+- **Tailwind CSS** with custom SAMAM AI theme (Deep Blue #0F4C81, Teal #20B2AA, Orange #FF6F3C)
 - **Lucide React** for icons
 - **Web Speech API** for STT (SpeechRecognition) and TTS (speechSynthesis)
 - Client-side JSON/CSV knowledge base — no backend required
@@ -74,7 +74,7 @@ Markdown file with YouTube tutorial links for NSP, myScheme, TNEA, and skill pla
 ```
 src/
 ├── components/
-│   ├── Logo.tsx          — Animated SDG10 logo
+│   ├── Logo.tsx          — Animated SAMAM AI logo
 │   ├── Navbar.tsx        — Navigation with language selector
 │   └── VoiceChat.tsx     — Voice input + TTS controls
 ├── data/
