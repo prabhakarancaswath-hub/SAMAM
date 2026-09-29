@@ -5,79 +5,39 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background-color: #f9fafb;
-    color: #111827;
-  }
-  [lang='ta'] {
-    font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
-  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', system-ui, sans-serif; background-color: #060b1a; color: #e5e7eb; }
+  [lang='ta'] { font-family: 'Noto Sans Tamil', 'Inter', sans-serif; }
 }
 
 @layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sdg-blue text-white font-medium shadow-lg shadow-sdg-blue/30 hover:bg-sdg-blue-light hover:shadow-xl hover:shadow-sdg-blue/40 active:scale-95 transition-all duration-200;
-  }
-  .btn-teal {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sdg-teal text-white font-medium shadow-lg shadow-sdg-teal/30 hover:bg-sdg-teal-light hover:shadow-xl hover:shadow-sdg-teal/40 active:scale-95 transition-all duration-200;
-  }
-  .btn-orange {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sdg-orange text-white font-medium shadow-lg shadow-sdg-orange/30 hover:bg-sdg-orange-light hover:shadow-xl hover:shadow-sdg-orange/40 active:scale-95 transition-all duration-200;
-  }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-sdg-blue font-medium border border-ink-200 hover:border-sdg-blue hover:bg-ink-50 active:scale-95 transition-all duration-200;
-  }
-  .card {
-    @apply bg-white rounded-2xl shadow-sm border border-ink-200/60 hover:shadow-lg hover:border-ink-300 transition-all duration-300;
-  }
-  .input-field {
-    @apply w-full px-4 py-2.5 rounded-xl border border-ink-300 bg-white text-ink-800 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-sdg-teal/40 focus:border-sdg-teal transition-all duration-200;
-  }
-  .badge {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
-  }
-  .section-title {
-    @apply text-2xl md:text-3xl font-bold text-ink-800;
-  }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sdg-blue text-white font-medium shadow-lg shadow-sdg-blue/30 hover:bg-sdg-blue-light hover:shadow-xl active:scale-95 transition-all duration-200; }
+  .btn-teal { @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sdg-teal text-white font-medium shadow-lg shadow-sdg-teal/30 hover:bg-sdg-teal-light hover:shadow-xl active:scale-95 transition-all duration-200; }
+  .btn-orange { @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sdg-orange text-white font-medium shadow-lg shadow-sdg-orange/30 hover:bg-sdg-orange-light hover:shadow-xl active:scale-95 transition-all duration-200; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-sdg-blue font-medium border border-ink-200 hover:border-sdg-blue hover:bg-ink-50 active:scale-95 transition-all duration-200; }
+  .card { @apply bg-white rounded-2xl shadow-sm border border-ink-200/60 hover:shadow-lg hover:border-ink-300 transition-all duration-300; }
+  .input-field { @apply w-full px-4 py-2.5 rounded-xl border border-ink-300 bg-white text-ink-800 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-sdg-teal/40 focus:border-sdg-teal transition-all duration-200; }
+  .badge { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium; }
+  .section-title { @apply text-2xl md:text-3xl font-bold text-ink-800; }
+  .interactive-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .interactive-card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(34,211,238,.08); }
+  .samam-logo-box { animation: samamLogoGlow 3s ease-in-out infinite; }
+  .samam-orb { animation: samamOrbFloat 5s ease-in-out infinite; }
+  .samam-grid { background-image: linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px); background-size: 48px 48px; }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f3f4f6;
-}
-::-webkit-scrollbar-thumb {
-  background: #0F4C81;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #1a6ab3;
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #070d1f; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-/* Shimmer loading */
-.shimmer-bg {
-  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2.5s linear infinite;
-}
+.shimmer-bg { background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%); background-size: 200% 100%; animation: shimmer 2.5s linear infinite; }
+.voice-bar { display: inline-block; width: 3px; margin: 0 1px; background: currentColor; border-radius: 2px; animation: wave 1.2s ease-in-out infinite; }
+.voice-bar:nth-child(2) { animation-delay: .1s; } .voice-bar:nth-child(3) { animation-delay: .2s; } .voice-bar:nth-child(4) { animation-delay: .3s; } .voice-bar:nth-child(5) { animation-delay: .4s; }
 
-/* Voice wave bars */
-.voice-bar {
-  display: inline-block;
-  width: 3px;
-  margin: 0 1px;
-  background: currentColor;
-  border-radius: 2px;
-  animation: wave 1.2s ease-in-out infinite;
+@keyframes samamLogoGlow { 0%,100% { box-shadow: 0 0 18px rgba(139,92,246,.25); } 50% { box-shadow: 0 0 32px rgba(34,211,238,.4); } }
+@keyframes samamOrbFloat { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.02); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
 }
-.voice-bar:nth-child(2) { animation-delay: 0.1s; }
-.voice-bar:nth-child(3) { animation-delay: 0.2s; }
-.voice-bar:nth-child(4) { animation-delay: 0.3s; }
-.voice-bar:nth-child(5) { animation-delay: 0.4s; }
