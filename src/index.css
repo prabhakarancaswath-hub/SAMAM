@@ -190,3 +190,33 @@
 @media (prefers-reduced-motion:reduce){
   .samam-splash-start{transition:none}
 }
+
+/* More visible community faces on the splash illustration */
+.samam-splash-people .person::before{
+  z-index:2;
+  width:58%; height:58%;
+  background:linear-gradient(145deg,#ffdcca 0%,#d99a86 100%);
+  box-shadow:0 -5px 0 6px rgba(39,22,77,.88);
+}
+.samam-splash-people .person::after{
+  z-index:3;
+  left:35%; right:auto; bottom:auto; top:-11%;
+  width:7px; height:7px; border-radius:50%;
+  background:#24143f;
+  box-shadow:14px 0 0 #24143f;
+}
+.samam-splash-people .person.p1::before{box-shadow:0 -7px 0 7px #24144f}
+.samam-splash-people .person.p2::before{box-shadow:0 -5px 0 8px #f0e7e1}
+.samam-splash-people .person.p3::before{background:linear-gradient(145deg,#8d5547,#c77f68);box-shadow:0 -5px 0 7px #21143d}
+.samam-splash-people .person.p4::before{background:linear-gradient(145deg,#b56d55,#e2a083);box-shadow:0 -5px 0 7px #191a36}
+.samam-splash-people .person.p5::before{background:linear-gradient(145deg,#704237,#b97561);box-shadow:0 -5px 0 7px #15112f}
+.samam-splash-people .person.p6::before{background:linear-gradient(145deg,#8e5148,#d18a73);box-shadow:0 -5px 0 7px #24143f}
+.samam-splash-people .person.p7::before{background:linear-gradient(145deg,#c57d68,#e6a18b);box-shadow:0 -5px 0 7px #24143f}
+.samam-splash-people .person.wheelchair i::after{
+  content:'';
+  position:absolute;
+  left:22%; top:42%;
+  width:44%; height:4px;
+  border-radius:4px;
+  background:rgba(18,13,54,.9);
+}
