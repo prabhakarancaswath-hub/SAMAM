@@ -11,23 +11,25 @@ interface Scheme {
 const schemes = schemesData as Scheme[];
 interface ChatMessage { role: 'user' | 'arthur'; content: string; }
 
-function ElephantAvatar({ size = 44, large = false }: { size?: number; large?: boolean }) {
+function GeethaAvatar({ size = 44, large = false }: { size?: number; large?: boolean }) {
   return (
-    <div className={`arthur-avatar relative flex items-center justify-center flex-shrink-0 ${large ? 'arthur-avatar-large' : ''}`} style={{ width: size, height: size }} aria-label="Arthur AI elephant">
-      <div className="arthur-avatar-ring" />
-      <div className="arthur-mini-ear left" />
-      <div className="arthur-mini-ear right" />
-      <div className="arthur-mini-head">
-        <div className="arthur-mini-eye left" />
-        <div className="arthur-mini-eye right" />
-        <div className="arthur-mini-trunk" />
-        <div className="arthur-mini-headset" />
+    <div className={`geetha-avatar relative flex items-center justify-center flex-shrink-0 ${large ? 'geetha-avatar-large' : ''}`} style={{ width: size, height: size }} aria-label="Geetha AI assistant">
+      <div className="geetha-avatar-ring" />
+      <div className="geetha-mini-ear left" />
+      <div className="geetha-mini-ear right" />
+      <div className="geetha-mini-head">
+        <div className="geetha-mini-eye left" />
+        <div className="geetha-mini-eye right" />
+        <div className="geetha-mini-trunk" />
+        <div className="geetha-mini-headset" />
+        <div className="geetha-mini-hair" />
+        <div className="geetha-mini-lip" />
       </div>
     </div>
   );
 }
 
-function generateArthurResponse(input: string, lang: Lang): string {
+function generateGeethaResponse(input: string, lang: Lang): string {
   const lower = input.toLowerCase();
   const isTa = lang === 'ta';
 
@@ -56,8 +58,8 @@ function generateArthurResponse(input: string, lang: Lang): string {
   }
 
   if (lower.includes('scholar') || lower.includes('உதவித்தொகை') || lower.includes('grant') || lower.includes('நிதி')) {
-    if (isTa) return `**உதவித்தொகை உதவி**\n\nஉங்கள் கல்வி நிலை, வகை, மற்றும் scheme-ன் தகுதி விதிகளைப் பார்த்து பொருத்தமான வாய்ப்புகளை கண்டறியலாம்.\n\n• அரசு scholarship portal-ஐ சரிபார்க்கவும்\n• scheme eligibility-ஐ முதலில் படிக்கவும்\n• ஆவணங்களை தயாராக வைத்துக்கொள்ளவும்\n• விண்ணப்ப reference number-ஐ சேமிக்கவும்\n\n**Arthur-க்கு கேட்கலாம்:** “என் scholarship-க்கு எப்படி apply செய்வது?”`;
-    return `**Scholarship help**\n\nI can help you understand schemes and the application path.\n\n• Check the official scholarship portal\n• Read eligibility first\n• Prepare required documents\n• Save your application reference number\n\n**Ask Arthur:** “How do I apply for a scholarship?”`;
+    if (isTa) return `**உதவித்தொகை உதவி**\n\nஉங்கள் கல்வி நிலை, வகை, மற்றும் scheme-ன் தகுதி விதிகளைப் பார்த்து பொருத்தமான வாய்ப்புகளை கண்டறியலாம்.\n\n• அரசு scholarship portal-ஐ சரிபார்க்கவும்\n• scheme eligibility-ஐ முதலில் படிக்கவும்\n• ஆவணங்களை தயாராக வைத்துக்கொள்ளவும்\n• விண்ணப்ப reference number-ஐ சேமிக்கவும்\n\n**Geetha-க்கு கேட்கலாம்:** “என் scholarship-க்கு எப்படி apply செய்வது?”`;
+    return `**Scholarship help**\n\nI can help you understand schemes and the application path.\n\n• Check the official scholarship portal\n• Read eligibility first\n• Prepare required documents\n• Save your application reference number\n\n**Ask Geetha:** “How do I apply for a scholarship?”`;
   }
 
   if (lower.includes('tnea') || lower.includes('counselling') || lower.includes('counseling') || lower.includes('college') || lower.includes('ஆலோசனை') || lower.includes('கல்லூரி') || lower.includes('engineering')) {
@@ -86,8 +88,8 @@ function generateArthurResponse(input: string, lang: Lang): string {
 
   if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('வணக்கம்') || lower.includes('ஹாய்')) {
     return isTa
-      ? `வணக்கம்! நான் **Arthur** 🐘. உதவித்தொகைகள், அரசு திட்டங்கள், அதிகாரப்பூர்வ இணையதளங்கள், TNEA மற்றும் விண்ணப்பிக்கும் படிகளை எளிமையாக விளக்க முடியும்.`
-      : `Hello! I'm **Arthur** 🐘. I can explain scholarships, government schemes, official websites, TNEA and application steps in simple language.`;
+      ? `வணக்கம்! நான் **Geetha** 🐘. உதவித்தொகைகள், அரசு திட்டங்கள், அதிகாரப்பூர்வ இணையதளங்கள், TNEA மற்றும் விண்ணப்பிக்கும் படிகளை எளிமையாக விளக்க முடியும்.`
+      : `Hello! I'm **Geetha** ✨. I can explain scholarships, government schemes, official websites, TNEA and application steps in simple language.`;
   }
 
   return isTa
@@ -95,9 +97,9 @@ function generateArthurResponse(input: string, lang: Lang): string {
     : `I can help with:\n\n• **Scholarships** — scholarship guidance\n• **Government schemes** — schemes and official portals\n• **Eligibility** — requirements and documents\n• **How to apply** — step-by-step guidance\n• **Low internet** — lightweight guidance\n• **TNEA / Skills / Jobs**\n\nChoose a segment below or ask your question.`;
 }
 
-interface ArthurChatbotProps { lang: Lang; setLang: (lang: Lang) => void; open?: boolean; onOpenChange?: (open: boolean) => void; }
+interface GeethaChatbotProps { lang: Lang; setLang: (lang: Lang) => void; open?: boolean; onOpenChange?: (open: boolean) => void; }
 
-export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange }: ArthurChatbotProps) {
+export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange }: GeethaChatbotProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -140,7 +142,7 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     setInput('');
     setTyping(true);
     setTimeout(() => {
-      const response = generateArthurResponse(text, chatLang);
+      const response = generateGeethaResponse(text, chatLang);
       setMessages(prev => [...prev, { role: 'arthur', content: response }]);
       setTyping(false);
     }, lowData ? 150 : 450);
@@ -171,9 +173,9 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 bg-gradient-to-br from-slate-950 via-violet-950 to-cyan-900 text-white px-4 py-3 rounded-2xl shadow-xl shadow-violet-500/20 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 animate-fade-in" aria-label="Open Arthur AI">
-          <ElephantAvatar size={40} />
-          <span className="font-semibold text-sm hidden sm:inline">Ask Arthur AI</span>
+        <button onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 bg-gradient-to-br from-slate-950 via-violet-950 to-cyan-900 text-white px-4 py-3 rounded-2xl shadow-xl shadow-violet-500/20 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 animate-fade-in" aria-label="Open Geetha AI">
+          <GeethaAvatar size={40} />
+          <span className="font-semibold text-sm hidden sm:inline">Ask Geetha AI</span>
         </button>
       )}
 
@@ -182,9 +184,9 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
           <div className="flex flex-col bg-[#071025] text-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-cyan-300/15 overflow-hidden" style={{ height: 'min(720px, 90vh)' }}>
             <div className="flex items-center justify-between bg-gradient-to-r from-[#080d24] via-[#25105d] to-[#063d55] px-4 py-3.5 flex-shrink-0">
               <div className="flex items-center gap-3">
-                <ElephantAvatar size={48} large />
+                <GeethaAvatar size={48} large />
                 <div>
-                  <p className="font-black text-white text-base leading-none">Arthur AI</p>
+                  <p className="font-black text-white text-base leading-none">Geetha AI</p>
                   <p className="text-cyan-100/70 text-xs mt-1">Government • Scholarships • Guidance</p>
                 </div>
               </div>
@@ -212,7 +214,7 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#061022]">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
-                  {msg.role === 'arthur' && <ElephantAvatar size={30} />}
+                  {msg.role === 'arthur' && <GeethaAvatar size={30} />}
                   <div className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-gradient-to-r from-violet-600 to-cyan-500 text-white rounded-br-md ml-2' : 'bg-white/[.07] text-slate-100 rounded-bl-md ml-2 border border-white/10 shadow-sm'}`}>
                     {msg.content.split('\n').map((line, j) => {
                       const parts = line.split(/(\*\*.+?\*\*)/g);
@@ -227,7 +229,7 @@ export function ArthurChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               ))}
               {typing && (
                 <div className="flex items-center gap-2 animate-fade-in">
-                  <ElephantAvatar size={30} />
+                  <GeethaAvatar size={30} />
                   <div className="bg-white/[.07] border border-white/10 rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex gap-1"><span className="w-2 h-2 rounded-full bg-cyan-300 animate-bounce-soft" /><span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce-soft" style={{ animationDelay: '0.2s' }} /><span className="w-2 h-2 rounded-full bg-fuchsia-400 animate-bounce-soft" style={{ animationDelay: '0.4s' }} /></div>
                   </div>
