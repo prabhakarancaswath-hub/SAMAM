@@ -1,8 +1,50 @@
-import { GraduationCap, BookOpen, Wrench, Briefcase, ArrowRight, Sparkles, Globe2, Mic, ShieldCheck, Search, MessageCircle, ChevronRight } from 'lucide-react';
+import { GraduationCap, BookOpen, Wrench, Briefcase, ArrowRight, Sparkles, Globe2, Mic, ShieldCheck, Search, MessageCircle, ChevronRight, WifiOff, Landmark } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import type { Page } from '@/components/Navbar';
 
 interface HomeProps { lang: Lang; setPage: (p: Page) => void; }
+
+function ArthurHero() {
+  return (
+    <div className="relative flex justify-center">
+      <div className="arthur-stage">
+        <div className="arthur-aura" />
+        <div className="arthur-spark arthur-spark-1" />
+        <div className="arthur-spark arthur-spark-2" />
+        <div className="arthur-spark arthur-spark-3" />
+        <div className="arthur-elephant" aria-label="Arthur AI elephant assistant">
+          <div className="arthur-ear arthur-ear-left" />
+          <div className="arthur-ear arthur-ear-right" />
+          <div className="arthur-head">
+            <div className="arthur-eye arthur-eye-left" />
+            <div className="arthur-eye arthur-eye-right" />
+            <div className="arthur-tusk arthur-tusk-left" />
+            <div className="arthur-tusk arthur-tusk-right" />
+            <div className="arthur-trunk" />
+            <div className="arthur-blush arthur-blush-left" />
+            <div className="arthur-blush arthur-blush-right" />
+            <div className="arthur-headset" />
+          </div>
+          <div className="arthur-body">
+            <div className="arthur-badge">A</div>
+          </div>
+        </div>
+        <div className="arthur-nameplate">
+          <span className="arthur-live-dot" /> ARTHUR AI
+          <small>Your access assistant</small>
+        </div>
+        <div className="absolute -right-3 top-12 px-4 py-2.5 rounded-2xl bg-slate-950/90 ring-1 ring-cyan-300/30 shadow-xl text-xs backdrop-blur">
+          <span className="text-cyan-300 font-bold">Ask Arthur</span><br />
+          <span className="text-slate-400">Schemes • Portals • Steps</span>
+        </div>
+        <div className="absolute -left-5 bottom-20 px-4 py-2.5 rounded-2xl bg-slate-950/90 ring-1 ring-violet-300/30 shadow-xl text-xs backdrop-blur">
+          <span className="text-violet-300 font-bold">Low Internet</span><br />
+          <span className="text-slate-400">Works with saved guidance</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Home({ lang, setPage }: HomeProps) {
   const features = [
@@ -19,7 +61,7 @@ export function Home({ lang, setPage }: HomeProps) {
       <div className="absolute top-80 -left-40 w-[28rem] h-[28rem] rounded-full bg-cyan-500/15 blur-3xl samam-float" style={{ animationDelay: '1.2s' }} />
 
       <section className="relative px-5 sm:px-10 lg:px-16 pt-12 pb-16 md:pt-20 md:pb-24">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.15fr_.85fr] gap-12 items-center">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_.95fr] gap-12 items-center">
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/5 ring-1 ring-cyan-300/20 text-cyan-200 text-xs font-semibold mb-6">
               <Sparkles size={14} /> AI-POWERED • EQUAL ACCESS
@@ -31,53 +73,36 @@ export function Home({ lang, setPage }: HomeProps) {
               </span>
             </h1>
             <p className="mt-6 max-w-2xl text-base sm:text-lg leading-8 text-slate-300">
-              {lang === 'ta' ? 'உதவித்தொகைகள், கல்வி, திறன்கள் மற்றும் வேலை வாய்ப்புகளை ஒரே இடத்தில் கண்டறிய SAMAM AI உங்களுக்கு உதவுகிறது.' : 'SAMAM AI brings scholarships, education guidance, skills and opportunities together in one simple place.'}
+              {lang === 'ta' ? 'உதவித்தொகைகள், அரசு நலத்திட்டங்கள், கல்வி, திறன்கள் மற்றும் வேலை வாய்ப்புகளை ஒரே இடத்தில் கண்டறிய SAMAM AI உங்களுக்கு உதவுகிறது.' : 'SAMAM AI helps you discover scholarships, government schemes, education guidance, skills and opportunities in one simple place.'}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button onClick={() => setPage('scholarships')} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-950 font-bold hover:scale-[1.03] transition-all shadow-xl">
                 Explore opportunities <ArrowRight size={18} />
               </button>
-              <button onClick={() => setPage('about')} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 ring-1 ring-white/15 text-white font-semibold hover:bg-white/10 transition-all">
-                <MessageCircle size={18} /> How SAMAM works
+              <button onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold hover:scale-[1.03] transition-all shadow-lg">
+                <MessageCircle size={18} /> Ask Arthur
               </button>
             </div>
-            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-400">
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-400">
               <span className="inline-flex items-center gap-1.5"><Globe2 size={14} className="text-cyan-300" /> Tamil + English</span>
-              <span className="inline-flex items-center gap-1.5"><Mic size={14} className="text-violet-300" /> Voice ready</span>
+              <span className="inline-flex items-center gap-1.5"><WifiOff size={14} className="text-violet-300" /> Low-internet friendly</span>
               <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-emerald-300" /> Official sources</span>
             </div>
           </div>
 
-          <div className="relative flex justify-center animate-scale-in">
-            <div className="absolute w-72 h-72 rounded-full bg-violet-500/20 blur-3xl" />
-            <div className="samam-orb relative w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-br from-cyan-300/20 via-violet-500/20 to-fuchsia-500/20 ring-1 ring-cyan-200/20 flex items-center justify-center">
-              <div className="absolute inset-5 rounded-full border border-cyan-200/20" />
-              <div className="absolute inset-12 rounded-full border border-violet-300/20" />
-              <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-full bg-gradient-to-br from-violet-600 via-blue-600 to-cyan-400 shadow-[0_0_80px_rgba(99,102,241,.45)] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl sm:text-7xl font-black text-white">S</div>
-                  <div className="text-[10px] tracking-[.3em] font-bold text-cyan-100">SAMAM AI</div>
-                </div>
-              </div>
-              <div className="absolute -right-2 top-12 px-4 py-2 rounded-2xl bg-slate-900/90 ring-1 ring-cyan-300/20 shadow-xl text-xs">
-                <span className="text-cyan-300 font-bold">Arthur</span><br />
-                <span className="text-slate-400">AI Assistant</span>
-              </div>
-              <div className="absolute -left-3 bottom-14 px-4 py-2 rounded-2xl bg-slate-900/90 ring-1 ring-violet-300/20 shadow-xl text-xs">
-                <span className="text-violet-300 font-bold">24/7</span><br />
-                <span className="text-slate-400">Guidance</span>
-              </div>
-            </div>
+          <div className="relative animate-scale-in">
+            <ArthurHero />
           </div>
         </div>
       </section>
 
       <section className="relative px-5 sm:px-10 lg:px-16 pb-14">
-        <div className="max-w-6xl mx-auto grid sm:grid-cols-3 gap-3">
+        <div className="max-w-6xl mx-auto grid sm:grid-cols-4 gap-3">
           {[
-            { icon: Search, value: '01', label: 'Discover', desc: 'Find relevant schemes and resources' },
-            { icon: MessageCircle, value: '02', label: 'Ask Arthur', desc: 'Get simple AI guidance' },
-            { icon: ShieldCheck, value: '03', label: 'Verify & act', desc: 'Use official links to apply' },
+            { icon: Search, value: '01', label: 'Discover', desc: 'Find schemes and resources' },
+            { icon: MessageCircle, value: '02', label: 'Ask Arthur', desc: 'Get simple guidance' },
+            { icon: Landmark, value: '03', label: 'Access portals', desc: 'Learn where and how to apply' },
+            { icon: WifiOff, value: '04', label: 'Low internet', desc: 'Use saved essential guidance' },
           ].map((item) => {
             const Icon = item.icon;
             return <div key={item.value} className="interactive-card rounded-2xl bg-white/[.04] ring-1 ring-white/10 p-5">
@@ -113,15 +138,17 @@ export function Home({ lang, setPage }: HomeProps) {
       </section>
 
       <section className="relative px-5 sm:px-10 lg:px-16 py-14">
-        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-violet-600/20 via-blue-600/10 to-cyan-500/20 ring-1 ring-white/10 p-7 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <p className="text-xs font-bold tracking-[.2em] text-violet-300 uppercase">Meet your assistant</p>
-            <h2 className="text-2xl sm:text-3xl font-black mt-2">Ask Arthur in English or Tamil.</h2>
-            <p className="text-slate-400 mt-2 max-w-xl">Get guided answers about scholarships, TNEA, skills and jobs without searching through multiple websites.</p>
+        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-violet-600/20 via-blue-600/10 to-cyan-500/20 ring-1 ring-white/10 p-7 sm:p-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <p className="text-xs font-bold tracking-[.2em] text-violet-300 uppercase">Government access guide</p>
+              <h2 className="text-2xl sm:text-3xl font-black mt-2">Arthur explains the next step.</h2>
+              <p className="text-slate-400 mt-2 max-w-2xl">Ask “How do I access a government scheme?” and Arthur gives a simple path: identify the scheme, open the official portal, check eligibility, prepare documents, submit, and save the application reference.</p>
+            </div>
+            <button onClick={() => document.dispatchEvent(new CustomEvent('open-arthur', { detail: { prompt: 'How do I access government websites and schemes?' } }))} className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold shadow-lg hover:scale-[1.03] transition-all">
+              <Sparkles size={18}/> Ask Arthur
+            </button>
           </div>
-          <button onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold shadow-lg hover:scale-[1.03] transition-all">
-            <Sparkles size={18}/> Chat with Arthur
-          </button>
         </div>
       </section>
     </div>
