@@ -118,3 +118,17 @@ This is an educational tool. Always verify information on official government we
 ## License
 
 Educational use. Built for SDG 10 — Reduced Inequalities.
+
+## Supabase Database
+
+The project now includes a Supabase-ready database schema at `supabase/schema.sql`.
+
+1. Create a Supabase project.
+2. Open **SQL Editor**.
+3. Paste and run `supabase/schema.sql`.
+4. Copy the project URL and the **anon/public** key into your deployment environment as:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+5. The Scholarships page will read from Supabase automatically. If the variables are missing or the database is unavailable, it safely falls back to the existing local `src/data/schemes.json` dataset.
+
+The schema contains scholarships, knowledge documents, FAQs, required documents, and an applications table. Existing scholarship records are marked `needs_verification`; verify active eligibility, amounts and deadlines against the official source before presenting them as current.
