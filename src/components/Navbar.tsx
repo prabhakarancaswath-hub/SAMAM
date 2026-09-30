@@ -1,15 +1,22 @@
-
 import { useState } from 'react';
-import { Home, GraduationCap, Info, Menu, X, Sparkles, MapPin, Building2 } from 'lucide-react';
+import { Home, GraduationCap, Info, Menu, X, Sparkles, MapPin, Building2, BriefcaseBusiness } from 'lucide-react';
 import { Logo } from './Logo';
 import { type Lang } from '@/i18n/translations';
 
-export type Page = 'home'|'scholarships'|'tnea'|'skills'|'jobs'|'about'|'faqs'|'services'|'maps';
+export type Page = 'home'|'scholarships'|'tnea'|'skills'|'jobs'|'careers'|'about'|'faqs'|'services'|'maps';
 interface NavbarProps { lang:Lang; setLang:(lang:Lang)=>void; page:Page; setPage:(p:Page)=>void; onArthur:()=>void; }
 
 export function Navbar({lang,setLang,page,setPage,onArthur}:NavbarProps){
  const [mobileOpen,setMobileOpen]=useState(false);
- const navItems=[{id:'home' as Page,label:'Home',icon:Home},{id:'scholarships' as Page,label:'Schemes',icon:GraduationCap},{id:'services' as Page,label:'Services',icon:Building2},{id:'maps' as Page,label:'Maps',icon:MapPin},{id:'about' as Page,label:'About',icon:Info}];
+ const navItems=[
+  {id:'home' as Page,label:'Home',icon:Home},
+  {id:'scholarships' as Page,label:'Schemes',icon:GraduationCap},
+  {id:'tnea' as Page,label:'TNEA',icon:GraduationCap},
+  {id:'careers' as Page,label:'Careers',icon:BriefcaseBusiness},
+  {id:'services' as Page,label:'Services',icon:Building2},
+  {id:'maps' as Page,label:'Maps',icon:MapPin},
+  {id:'about' as Page,label:'About',icon:Info}
+ ];
  const go=(p:Page)=>{setPage(p);setMobileOpen(false);window.scrollTo({top:0,behavior:'smooth'})};
  return <header className="sticky top-0 z-50 border-b border-white/10 bg-[#060b1a]/90 backdrop-blur-xl">
   <div className="max-w-7xl mx-auto px-4 sm:px-6"><div className="flex items-center justify-between h-[70px]">
