@@ -108,3 +108,11 @@
 .samam-mobile-bottom{position:sticky;bottom:0;z-index:30;margin:20px -16px -40px;padding:10px 18px 12px;display:flex;justify-content:space-around;border-top:1px solid rgba(255,255,255,.1);background:rgba(5,10,24,.94);backdrop-filter:blur(16px)}
 .samam-mobile-bottom button{display:flex;flex-direction:column;align-items:center;gap:3px;color:#94a3b8;font-size:9px}.samam-mobile-bottom button:first-child{color:#67e8f9}.samam-mobile-bottom svg{width:18px;height:18px}
 @media(max-width:640px){.samam-arthur-card{padding:15px}.samam-arthur-avatar{width:76px;height:76px;font-size:38px}.samam-page{padding:20px;border-radius:24px}.samam-map{height:430px}}
+
+
+.samam-career-hero{position:relative;overflow:hidden;border:1px solid rgba(103,232,249,.16);border-radius:30px;padding:28px;background:linear-gradient(120deg,rgba(76,29,149,.48),rgba(8,47,73,.42),rgba(15,23,42,.7));box-shadow:0 24px 70px rgba(34,211,238,.08)}
+.samam-career-orb{position:absolute;right:-70px;top:-90px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.24),rgba(124,58,237,.12),transparent 68%);filter:blur(8px)}
+.samam-career-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);border-radius:999px;padding:7px 11px;font-size:11px;color:#cbd5e1}
+.samam-career-card{border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:20px;background:rgba(255,255,255,.035);transition:.25s ease}
+.samam-career-card:hover{transform:translateY(-4px);border-color:rgba(103,232,249,.3);box-shadow:0 20px 50px rgba(34,211,238,.08)}
+.samam-career-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:17px;background:linear-gradient(135deg,rgba(124,58,237,.7),rgba(6,182,212,.65));color:white;box-shadow:0 0 25px rgba(34,211,238,.15)}
