@@ -8,7 +8,7 @@ interface HomeProps { lang: Lang; setPage: (p: Page) => void; }
 function GeethaHero({lang}:{lang:Lang}) {
  return <div className="samam-arthur-card">
   <div className="samam-arthur-glow" />
-  <div className="samam-arthur-avatar"><span>🐘</span><i>A</i></div>
+  <div className="samam-arthur-avatar"><span>👩‍💼</span><i>A</i></div>
   <div className="samam-arthur-copy">
    <div className="flex items-center gap-2"><span className="samam-live-dot"/> <span className="text-xs font-bold text-cyan-200">ARTHUR • {bi(lang,'ONLINE','ஆன்லைன்')}</span></div>
    <h2 className="mt-1 text-2xl font-black">Geetha AI</h2>
