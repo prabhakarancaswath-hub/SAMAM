@@ -13,6 +13,7 @@ import { FAQs } from '@/pages/FAQs';
 import { Services } from '@/pages/Services';
 import { Maps } from '@/pages/Maps';
 import { Accessibility } from '@/pages/Accessibility';
+import { SplashScreen } from '@/components/SplashScreen';
 import { type Lang, t } from '@/i18n/translations';
 import { bi } from '@/i18n/bilingual';
 
@@ -22,6 +23,8 @@ function App() {
  const [page,setPage]=useState<Page>('home');
  const [responseText,setResponseText]=useState('');
  const [arthurOpen,setArthurOpen]=useState(false);
+ const [showSplash,setShowSplash]=useState(() => sessionStorage.getItem('samam-splash-seen') !== '1');
+ const enterApp=()=>{sessionStorage.setItem('samam-splash-seen','1');setShowSplash(false)};
  useEffect(()=>{document.documentElement.lang=lang},[lang]);
  useEffect(()=>{const open=()=>setArthurOpen(true);document.addEventListener('open-arthur',open);return()=>document.removeEventListener('open-arthur',open)},[]);
  const handleTranscript=(text:string)=>{
@@ -37,6 +40,7 @@ function App() {
   else if(l.includes('about')||l.includes('sdg')||l.includes('inequal')||l.includes('பற்றி')||l.includes('சமத்துவ'))target='about';
   setPage(target);setResponseText(bi(lang,'Arthur understood your request. SAMAM opened the relevant support area.','ஆர்தர் உங்கள் கோரிக்கையைப் புரிந்துகொண்டார். SAMAM தொடர்புடைய பகுதியைத் திறந்துள்ளது.'));window.scrollTo({top:0,behavior:'smooth'})
  };
+ if(showSplash) return <SplashScreen lang={lang} onStart={enterApp} onLanguage={setLang}/>;
  return <div className="min-h-screen bg-[#060b1a]" lang={lang}>
   <Navbar lang={lang} setLang={setLang} page={page} setPage={setPage} onArthur={()=>setArthurOpen(true)}/>
   <main className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
