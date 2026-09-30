@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, ExternalLink, CheckCircle2, Filter, Sparkles, X, Youtube } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
+import { supabase } from '@/lib/supabase';
 
 interface Scheme {
   id: string;
@@ -35,8 +36,40 @@ export function Scholarships({ lang }: { lang: Lang }) {
   const [matchEdu, setMatchEdu] = useState('');
   const [matchResults, setMatchResults] = useState<Scheme[]>([]);
   const [matchStep, setMatchStep] = useState(0);
+  const [schemes, setSchemes] = useState<Scheme[]>(schemesData as Scheme[]);
+  const [dataSource, setDataSource] = useState<'database' | 'local'>('local');
 
-  const schemes = schemesData as Scheme[];
+  useEffect(() => {
+    let active = true;
+    if (!supabase) return;
+
+    supabase
+      .from('scholarships')
+      .select('id,name,name_ta,category,gender,income_limit,education_level,provider,benefits,benefits_ta,eligibility,apply_link,tags')
+      .order('id')
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error || !data?.length) return;
+        setSchemes(data.map((row: any) => ({
+          id: row.id,
+          name: row.name,
+          name_ta: row.name_ta ?? row.name,
+          category: row.category ?? [],
+          gender: row.gender ?? 'all',
+          incomeLimit: Number(row.income_limit ?? 0),
+          educationLevel: row.education_level ?? '',
+          provider: row.provider ?? '',
+          benefits: row.benefits ?? '',
+          benefits_ta: row.benefits_ta ?? row.benefits ?? '',
+          eligibility: row.eligibility ?? [],
+          applyLink: row.apply_link ?? '',
+          tags: row.tags ?? [],
+        })));
+        setDataSource('database');
+      });
+
+    return () => { active = false; };
+  }, []);
 
   const filtered = useMemo(() => {
     return schemes.filter((s) => {
