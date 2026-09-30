@@ -53,16 +53,18 @@
 .arthur-live-dot { display:inline-block; width:7px; height:7px; margin-right:6px; border-radius:50%; background:#34d399; box-shadow:0 0 10px #34d399; animation:livePulse 1.5s infinite; }
 .arthur-spark { position:absolute; width:7px; height:7px; border-radius:50%; background:#67e8f9; box-shadow:0 0 16px #67e8f9; animation: spark 2.8s ease-in-out infinite; }
 .arthur-spark-1{top:80px;left:58px}.arthur-spark-2{top:155px;right:35px;animation-delay:.7s}.arthur-spark-3{bottom:100px;left:70px;animation-delay:1.2s}
-.arthur-avatar { border-radius: 34%; background:linear-gradient(145deg,#67e8f9,#6366f1 55%,#a855f7); box-shadow:0 0 22px rgba(34,211,238,.22); overflow:hidden; }
-.arthur-avatar-ring { position:absolute; inset:-3px; border-radius:36%; border:1px solid rgba(255,255,255,.28); animation:avatarPulse 2.4s ease-in-out infinite; }
-.arthur-mini-head { position:absolute; width:58%; height:55%; top:22%; left:21%; border-radius:48%; background:linear-gradient(145deg,#d8fbff,#68d8f0 50%,#6672e8); }
-.arthur-mini-ear { position:absolute; width:38%; height:55%; top:23%; border-radius:50%; background:linear-gradient(145deg,#7cecff,#7c62e9); }
-.arthur-mini-ear.left{left:2%;transform:rotate(-14deg)} .arthur-mini-ear.right{right:2%;transform:rotate(14deg)}
-.arthur-mini-eye { position:absolute; top:32%; width:11%; height:17%; border-radius:50%; background:#071025; z-index:2; }
-.arthur-mini-eye.left{left:26%}.arthur-mini-eye.right{right:26%}
-.arthur-mini-trunk { position:absolute; top:43%; left:43%; width:16%; height:38%; border-radius:10px; background:#4dbbdf; z-index:3; animation:miniTrunk 2.5s ease-in-out infinite; }
-.arthur-mini-headset { position:absolute; inset:5%; border:2px solid rgba(196,181,253,.8); border-bottom-color:transparent; border-radius:50%; z-index:4; }
-.arthur-avatar-large { box-shadow:0 0 30px rgba(34,211,238,.25); }
+.geetha-avatar { position:relative; border-radius:34%; background:linear-gradient(145deg,#67e8f9,#6366f1 55%,#a855f7); box-shadow:0 0 22px rgba(34,211,238,.22); overflow:hidden; }
+.geetha-avatar-ring { position:absolute; inset:-3px; border-radius:36%; border:1px solid rgba(255,255,255,.3); animation:avatarPulse 2.4s ease-in-out infinite; }
+.geetha-hair { position:absolute; width:68%; height:72%; top:8%; left:16%; border-radius:48% 48% 40% 40%; background:linear-gradient(145deg,#171329,#3b236b 70%,#111827); z-index:1; }
+.geetha-face { position:absolute; width:52%; height:52%; top:22%; left:24%; border-radius:48% 48% 45% 45%; background:linear-gradient(145deg,#ffe1cf,#f6b7a0 65%,#d88787); z-index:2; }
+.geetha-eye { position:absolute; top:38%; width:9%; height:12%; border-radius:50%; background:#111827; }
+.geetha-eye.left{left:27%}.geetha-eye.right{right:27%}
+.geetha-brow { position:absolute; top:30%; width:18%; height:3px; border-radius:4px; background:#4c2a3c; }
+.geetha-brow.left{left:20%;transform:rotate(-8deg)}.geetha-brow.right{right:20%;transform:rotate(8deg)}
+.geetha-mouth { position:absolute; left:42%; top:65%; width:16%; height:7px; border-bottom:2px solid #9f3f6d; border-radius:0 0 50% 50%; }
+.geetha-shoulders { position:absolute; left:17%; bottom:-5%; width:66%; height:34%; border-radius:48% 48% 18% 18%; background:linear-gradient(135deg,#7c3aed,#06b6d4); z-index:3; display:grid; place-items:center; }
+.geetha-shoulders span{font-weight:900;color:white;font-size:clamp(10px,28%,16px)}
+.geetha-avatar-large { box-shadow:0 0 30px rgba(168,85,247,.3),0 0 50px rgba(34,211,238,.18); }
 .low-data-mode * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 .no-scrollbar::-webkit-scrollbar { display:none; }
 .no-scrollbar { scrollbar-width:none; }
@@ -92,7 +94,7 @@
 
 .samam-arthur-card{position:relative;display:flex;align-items:center;gap:18px;margin-top:18px;overflow:hidden;border:1px solid rgba(103,232,249,.18);border-radius:28px;padding:20px;background:linear-gradient(120deg,rgba(76,29,149,.42),rgba(8,47,73,.38));box-shadow:0 20px 60px rgba(34,211,238,.08)}
 .samam-arthur-glow{position:absolute;right:-40px;bottom:-70px;width:230px;height:230px;border-radius:50%;background:rgba(34,211,238,.18);filter:blur(45px)}
-.samam-arthur-avatar{position:relative;display:grid;place-items:center;width:92px;height:92px;flex:none;border-radius:28px;background:radial-gradient(circle at 40% 30%,#e0fbff,#65d8f0 45%,#6047db);box-shadow:0 0 35px rgba(34,211,238,.3);font-size:48px}
+.samam-arthur-avatar{position:relative;display:grid;place-items:center;width:92px;height:92px;flex:none;border-radius:28px;background:radial-gradient(circle at 40% 30%,#e0fbff,#65d8f0 45%,#6047db);box-shadow:0 0 35px rgba(168,85,247,.3);font-size:48px}
 .samam-arthur-avatar i{position:absolute;right:-4px;bottom:-4px;width:28px;height:28px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,#a855f7,#22d3ee);font-size:12px;font-style:normal;font-weight:900}
 .samam-live-dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}
 .samam-quick-card,.samam-scheme-card,.samam-info-card,.samam-service-card{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);border-radius:22px;transition:.25s ease}
