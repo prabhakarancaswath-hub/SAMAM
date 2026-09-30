@@ -26,6 +26,56 @@
   .samam-grid { background-image: linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px); background-size: 48px 48px; }
 }
 
+.arthur-stage { position: relative; width: min(430px, 92vw); height: 500px; display: flex; align-items: center; justify-content: center; }
+.arthur-aura { position: absolute; width: 330px; height: 330px; border-radius: 50%; background: radial-gradient(circle, rgba(34,211,238,.28), rgba(124,58,237,.18) 45%, transparent 72%); filter: blur(12px); animation: arthurAura 4s ease-in-out infinite; }
+.arthur-elephant { position: relative; width: 245px; height: 315px; animation: arthurFloat 4s ease-in-out infinite; filter: drop-shadow(0 25px 35px rgba(0,0,0,.35)); }
+.arthur-head { position: absolute; left: 47px; top: 50px; width: 151px; height: 145px; border-radius: 48% 48% 45% 45%; background: linear-gradient(145deg,#b8f4ff 0%,#5dd8f3 42%,#6170e8 100%); box-shadow: inset -16px -18px 30px rgba(67,42,170,.28), inset 12px 10px 24px rgba(255,255,255,.32); z-index: 3; }
+.arthur-ear { position: absolute; top: 62px; width: 72px; height: 116px; border-radius: 58% 42% 55% 45%; background: linear-gradient(145deg,#7cecff,#7a62e8); box-shadow: inset 0 0 25px rgba(255,255,255,.25); z-index: 1; animation: arthurEar 2.8s ease-in-out infinite; }
+.arthur-ear-left { left: 4px; transform: rotate(-16deg); }
+.arthur-ear-right { right: 4px; transform: rotate(16deg) scaleX(-1); animation-delay: .15s; }
+.arthur-eye { position: absolute; top: 55px; width: 18px; height: 24px; border-radius: 50%; background: #071025; box-shadow: 0 0 0 5px rgba(255,255,255,.25); }
+.arthur-eye::after { content: ''; position: absolute; width: 6px; height: 8px; border-radius: 50%; background: white; top: 3px; left: 4px; }
+.arthur-eye-left { left: 42px; } .arthur-eye-right { right: 42px; }
+.arthur-trunk { position: absolute; left: 58px; top: 72px; width: 38px; height: 86px; border-radius: 20px 20px 24px 24px; background: linear-gradient(90deg,#7deafa,#4db7df,#7663df); transform-origin: top center; animation: arthurTrunk 2.5s ease-in-out infinite; z-index: 4; }
+.arthur-trunk::after { content: ''; position: absolute; bottom: -3px; left: 8px; width: 22px; height: 14px; border-radius: 50%; background: #55bfe1; }
+.arthur-tusk { position: absolute; top: 98px; width: 20px; height: 34px; border: 5px solid #fff7df; border-top: 0; border-radius: 0 0 70% 70%; z-index: 5; }
+.arthur-tusk-left { left: 30px; transform: rotate(28deg); } .arthur-tusk-right { right: 30px; transform: rotate(-28deg); }
+.arthur-blush { position: absolute; top: 92px; width: 23px; height: 12px; border-radius: 50%; background: rgba(244,114,182,.38); }
+.arthur-blush-left { left: 20px; } .arthur-blush-right { right: 20px; }
+.arthur-headset { position: absolute; left: 10px; top: 12px; width: 132px; height: 128px; border: 5px solid rgba(196,181,253,.8); border-bottom-color: transparent; border-radius: 50%; z-index: 5; }
+.arthur-headset::after { content: 'A'; position: absolute; right: -12px; top: 42px; width: 26px; height: 26px; border-radius: 9px; background: linear-gradient(135deg,#a855f7,#22d3ee); color: white; font-weight: 900; font-size: 13px; display: grid; place-items: center; box-shadow: 0 0 18px rgba(34,211,238,.6); }
+.arthur-body { position: absolute; left: 34px; top: 183px; width: 178px; height: 120px; border-radius: 48% 48% 28% 28%; background: linear-gradient(160deg,#667eea,#4338ca 58%,#1d4ed8); box-shadow: inset 12px 8px 28px rgba(255,255,255,.16), 0 18px 30px rgba(37,99,235,.28); z-index: 2; }
+.arthur-body::before,.arthur-body::after { content:''; position:absolute; bottom:18px; width:42px; height:70px; border-radius: 50%; background: linear-gradient(160deg,#6ee7f9,#4f46e5); }
+.arthur-body::before { left:-12px; transform:rotate(18deg); } .arthur-body::after { right:-12px; transform:rotate(-18deg); }
+.arthur-badge { position: absolute; left: 64px; top: 36px; width: 50px; height: 50px; border-radius: 15px; background: rgba(8,13,36,.5); border: 1px solid rgba(255,255,255,.25); display:grid; place-items:center; color:#fff; font-size:24px; font-weight:900; box-shadow:0 0 24px rgba(34,211,238,.25); }
+.arthur-nameplate { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); padding:10px 16px; min-width:190px; text-align:center; border-radius:18px; background:rgba(7,16,37,.82); border:1px solid rgba(103,232,249,.22); backdrop-filter:blur(12px); font-weight:900; letter-spacing:.16em; color:#a5f3fc; font-size:12px; box-shadow:0 14px 40px rgba(0,0,0,.25); }
+.arthur-nameplate small { display:block; margin-top:3px; letter-spacing:.02em; color:#94a3b8; font-size:10px; font-weight:500; }
+.arthur-live-dot { display:inline-block; width:7px; height:7px; margin-right:6px; border-radius:50%; background:#34d399; box-shadow:0 0 10px #34d399; animation:livePulse 1.5s infinite; }
+.arthur-spark { position:absolute; width:7px; height:7px; border-radius:50%; background:#67e8f9; box-shadow:0 0 16px #67e8f9; animation: spark 2.8s ease-in-out infinite; }
+.arthur-spark-1{top:80px;left:58px}.arthur-spark-2{top:155px;right:35px;animation-delay:.7s}.arthur-spark-3{bottom:100px;left:70px;animation-delay:1.2s}
+.arthur-avatar { border-radius: 34%; background:linear-gradient(145deg,#67e8f9,#6366f1 55%,#a855f7); box-shadow:0 0 22px rgba(34,211,238,.22); overflow:hidden; }
+.arthur-avatar-ring { position:absolute; inset:-3px; border-radius:36%; border:1px solid rgba(255,255,255,.28); animation:avatarPulse 2.4s ease-in-out infinite; }
+.arthur-mini-head { position:absolute; width:58%; height:55%; top:22%; left:21%; border-radius:48%; background:linear-gradient(145deg,#d8fbff,#68d8f0 50%,#6672e8); }
+.arthur-mini-ear { position:absolute; width:38%; height:55%; top:23%; border-radius:50%; background:linear-gradient(145deg,#7cecff,#7c62e9); }
+.arthur-mini-ear.left{left:2%;transform:rotate(-14deg)} .arthur-mini-ear.right{right:2%;transform:rotate(14deg)}
+.arthur-mini-eye { position:absolute; top:32%; width:11%; height:17%; border-radius:50%; background:#071025; z-index:2; }
+.arthur-mini-eye.left{left:26%}.arthur-mini-eye.right{right:26%}
+.arthur-mini-trunk { position:absolute; top:43%; left:43%; width:16%; height:38%; border-radius:10px; background:#4dbbdf; z-index:3; animation:miniTrunk 2.5s ease-in-out infinite; }
+.arthur-mini-headset { position:absolute; inset:5%; border:2px solid rgba(196,181,253,.8); border-bottom-color:transparent; border-radius:50%; z-index:4; }
+.arthur-avatar-large { box-shadow:0 0 30px rgba(34,211,238,.25); }
+.low-data-mode * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+.no-scrollbar::-webkit-scrollbar { display:none; }
+.no-scrollbar { scrollbar-width:none; }
+
+@keyframes arthurFloat { 0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)} }
+@keyframes arthurEar { 0%,100%{transform:rotate(-16deg)}50%{transform:rotate(-10deg) translateY(-3px)} }
+@keyframes arthurTrunk { 0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg) translateY(2px)} }
+@keyframes arthurAura { 0%,100%{transform:scale(.96);opacity:.75}50%{transform:scale(1.06);opacity:1} }
+@keyframes livePulse { 0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.15)} }
+@keyframes spark { 0%,100%{transform:translateY(0) scale(.7);opacity:.35}50%{transform:translateY(-15px) scale(1.2);opacity:1} }
+@keyframes avatarPulse { 0%,100%{opacity:.45}50%{opacity:1} }
+@keyframes miniTrunk { 0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)} }
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #070d1f; }
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -34,9 +84,6 @@
 .shimmer-bg { background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%); background-size: 200% 100%; animation: shimmer 2.5s linear infinite; }
 .voice-bar { display: inline-block; width: 3px; margin: 0 1px; background: currentColor; border-radius: 2px; animation: wave 1.2s ease-in-out infinite; }
 .voice-bar:nth-child(2) { animation-delay: .1s; } .voice-bar:nth-child(3) { animation-delay: .2s; } .voice-bar:nth-child(4) { animation-delay: .3s; } .voice-bar:nth-child(5) { animation-delay: .4s; }
-
-@keyframes samamLogoGlow { 0%,100% { box-shadow: 0 0 18px rgba(139,92,246,.25); } 50% { box-shadow: 0 0 32px rgba(34,211,238,.4); } }
-@keyframes samamOrbFloat { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.02); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
