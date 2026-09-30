@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen } from 'lucide-react';
+import { X, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
 
