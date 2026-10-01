@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
+import { supabase } from '@/lib/supabase';
 
 interface Scheme {
   id: string; name: string; name_ta: string; category: string[]; gender: string; incomeLimit: number;
@@ -97,6 +98,39 @@ function generateGeethaResponse(input: string, lang: Lang): string {
     : `I can help with:\n\n• **Scholarships** — scholarship guidance\n• **Government schemes** — schemes and official portals\n• **Eligibility** — requirements and documents\n• **How to apply** — step-by-step guidance\n• **Low internet** — lightweight guidance\n• **TNEA / Skills / Jobs**\n\nChoose a segment below or ask your question.`;
 }
 
+interface GuideRow { id: string; name: string; type: 'government' | 'private'; eligibility: string; benefits: string; documents: string; application_route: string; official_source: string; status_notes?: string | null; }
+
+const GUIDE_KEYWORDS = ['scholar','scholarship','deadline','2026','2027','eligib','benefit','document','apply','application','nsp','otr','umis','bc','mbc','dnc','aicte','pragati','saksham','swanath','csss','pm yasasvi','உதவித்தொகை','தகுதி','ஆவணம்','விண்ணப்ப','கடைசி தேதி','ஓடிஆர்','யூமிஸ்'];
+
+async function getGuideResponse(input: string, lang: Lang): Promise<string | null> {
+  if (!supabase) return null;
+  const lower = input.toLowerCase();
+  if (!GUIDE_KEYWORDS.some(k => lower.includes(k))) return null;
+  try {
+    const [guideResult, knowledgeResult] = await Promise.all([
+      supabase.from('scholarship_guide_2026_27').select('id,name,type,eligibility,benefits,documents,application_route,official_source,status_notes').limit(50),
+      supabase.from('knowledge_documents').select('title,content').ilike('title', '%2026%').limit(5)
+    ]);
+    const guide = (guideResult.data || []) as GuideRow[];
+    const terms = lower.split(/[^a-z0-9\u0B80-\u0BFF]+/i).filter(x => x.length >= 3);
+    const matches = guide.filter(row => {
+      const hay = [row.name,row.eligibility,row.benefits,row.application_route].join(' ').toLowerCase();
+      return terms.some(term => hay.includes(term));
+    });
+    if (matches.length) {
+      const item = matches[0];
+      const title = lang === 'ta' ? '**' + item.name + ' — 2026–27 வழிகாட்டி**' : '**' + item.name + ' — 2026–27 guide**';
+      const out = [title, '', (lang === 'ta' ? 'தகுதி: ' : 'Eligibility: ') + item.eligibility, '', (lang === 'ta' ? 'நன்மை: ' : 'Benefit: ') + item.benefits, '', (lang === 'ta' ? 'ஆவணங்கள்: ' : 'Documents: ') + item.documents, '', (lang === 'ta' ? 'விண்ணப்ப வழி: ' : 'Application route: ') + item.application_route, '', (lang === 'ta' ? 'அதிகாரப்பூர்வ மூலம்: ' : 'Official source: ') + item.official_source];
+      if (item.status_notes) out.push('', (lang === 'ta' ? 'நிலை குறிப்பு: ' : 'Status note: ') + item.status_notes);
+      out.push('', lang === 'ta' ? '⚠️ இந்த தகவல் 30-09-2026 அன்று தயாரிக்கப்பட்ட வழங்கப்பட்ட வழிகாட்டியிலிருந்து பெறப்பட்டது. சமர்ப்பிப்பதற்கு முன் அதிகாரப்பூர்வ portal/notification-ஐ சரிபார்க்கவும்.' : '⚠️ This information comes from the supplied guide prepared 30 Sep 2026. Verify the live official portal/notification before submitting.');
+      return out.join('\n');
+    }
+    const sourceDoc = (knowledgeResult.data || [])[0]?.content;
+    if (sourceDoc) return (lang === 'ta' ? '**2026–27 உதவித்தொகை தகவல்**\n\n' : '**2026–27 scholarship information**\n\n') + sourceDoc + '\n\n⚠️ Verify the live official portal before submitting.';
+  } catch {}
+  return null;
+}
+
 interface GeethaChatbotProps { lang: Lang; setLang: (lang: Lang) => void; open?: boolean; onOpenChange?: (open: boolean) => void; }
 
 export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange }: GeethaChatbotProps) {
@@ -141,8 +175,8 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     setMessages(prev => [...prev, { role: 'user', content: text.trim() }]);
     setInput('');
     setTyping(true);
-    setTimeout(() => {
-      const response = generateGeethaResponse(text, chatLang);
+    setTimeout(async () => {
+      const response = (await getGuideResponse(text, chatLang)) ?? generateGeethaResponse(text, chatLang);
       setMessages(prev => [...prev, { role: 'arthur', content: response }]);
       setTyping(false);
     }, lowData ? 150 : 450);
