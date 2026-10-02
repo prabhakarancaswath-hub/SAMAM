@@ -15,7 +15,7 @@ function GeethaHero({lang,onGeetha}:{lang:Lang;onGeetha:()=>void}) {
    <p className="mt-1 text-sm leading-5 text-slate-300">{bi(lang,'Your guide to equal access — schemes, education, careers, services and support.','சம அணுகலுக்கான உங்கள் வழிகாட்டி — திட்டங்கள், கல்வி, தொழில், சேவைகள் மற்றும் ஆதரவு.')}</p>
    <span className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-4 py-2 text-sm font-bold shadow-lg">{bi(lang,'Ask Geetha','கீதாவிடம் கேளுங்கள்')} <ArrowRight size={15} className="ml-1"/></span>
   </div>
- </div></button>;
+ </button>;
 }
 
 export function Home({ lang, setPage, onGeetha }: HomeProps) {
