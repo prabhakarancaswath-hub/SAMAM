@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Home, GraduationCap, Info, Menu, X, Sparkles, MapPin, Building2, BriefcaseBusiness, Accessibility as AccessibilityIcon, Wrench, Briefcase } from 'lucide-react';
+import { Home, GraduationCap, Info, Menu, X, Sparkles, Building2, BriefcaseBusiness, Accessibility as AccessibilityIcon, Wrench, Briefcase } from 'lucide-react';
 import { Logo } from './Logo';
 import { type Lang } from '@/i18n/translations';
 import { bi } from '@/i18n/bilingual';
 
-export type Page = 'home'|'scholarships'|'tnea'|'skills'|'jobs'|'careers'|'about'|'faqs'|'services'|'maps'|'accessibility';
+export type Page = 'home'|'scholarships'|'tnea'|'skills'|'jobs'|'careers'|'about'|'faqs'|'services'|'accessibility';
 interface NavbarProps { lang:Lang; setLang:(lang:Lang)=>void; page:Page; setPage:(p:Page)=>void; onArthur:()=>void; }
 
 export function Navbar({lang,setLang,page,setPage,onArthur}:NavbarProps){
@@ -15,7 +15,6 @@ export function Navbar({lang,setLang,page,setPage,onArthur}:NavbarProps){
   {id:'tnea' as Page,label:'TNEA',icon:GraduationCap},
   {id:'careers' as Page,label:bi(lang,'Careers','தொழில் வாய்ப்புகள்'),icon:BriefcaseBusiness},
   {id:'services' as Page,label:bi(lang,'Services','சேவைகள்'),icon:Building2},
-  {id:'maps' as Page,label:bi(lang,'Maps','வரைபடம்'),icon:MapPin},
   {id:'accessibility' as Page,label:bi(lang,'Access','அணுகல்'),icon:AccessibilityIcon},
   {id:'about' as Page,label:bi(lang,'About','பற்றி'),icon:Info}
  ];
