@@ -12,14 +12,11 @@ A bilingual (Tamil + English) AI voice/chat assistant web app for **SDG 10 (Redu
 
 4. **Small Jobs / Internships Board** — Curated jobs board with role, location, stipend/salary, contact, and link. Shows top 5 matches with search and filter by location and job type.
 
-5. **Voice + Chat UX** — Language selector (Tamil/English), microphone button for voice input (Web Speech API SpeechRecognition), text-to-speech toggle (Web Speech API speechSynthesis), Repeat and Slower controls, and a fallback verification message.
-
 ## Tech Stack
 
 - **React** + **Vite** + **TypeScript**
 - **Tailwind CSS** with custom SAMAM AI theme (Deep Blue #0F4C81, Teal #20B2AA, Orange #FF6F3C)
 - **Lucide React** for icons
-- **Web Speech API** for STT (SpeechRecognition) and TTS (speechSynthesis)
 - Client-side JSON/CSV knowledge base — no backend required
 
 ## How to Run
@@ -76,14 +73,12 @@ src/
 ├── components/
 │   ├── Logo.tsx          — Animated SAMAM AI logo
 │   ├── Navbar.tsx        — Navigation with language selector
-│   └── VoiceChat.tsx     — Voice input + TTS controls
 ├── data/
 │   ├── schemes.json      — 31 scholarships/schemes
 │   ├── colleges.csv      — 50 engineering colleges
 │   ├── jobs.json         — 12 job/internship listings
 │   └── guides.md         — YouTube tutorial links
 ├── hooks/
-│   └── useSpeech.ts      — TTS + STT hooks
 ├── i18n/
 │   └── translations.ts   — Tamil + English translations
 ├── pages/
@@ -97,12 +92,6 @@ src/
 ├── main.tsx              — Entry point
 └── index.css            — Tailwind + custom styles
 ```
-
-## Voice Features
-
-- **Speech-to-Text**: Uses `webkitSpeechRecognition` / `SpeechRecognition`. Falls back to text input if unsupported.
-- **Text-to-Speech**: Uses `speechSynthesis`. Toggle on/off, with Repeat, Slower, and Faster controls.
-- **Language-aware**: TTS and STT use `ta-IN` for Tamil and `en-US` for English.
 
 ## Important Note
 
