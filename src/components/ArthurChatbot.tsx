@@ -101,6 +101,15 @@ function generateGeethaResponse(input: string, lang: Lang): string {
     : `I can help with:\n\n• **Scholarships** — scholarship guidance\n• **Government schemes** — schemes and official portals\n• **Eligibility** — requirements and documents\n• **How to apply** — step-by-step guidance\n• **Low internet** — lightweight guidance\n• **TNEA / Skills / Jobs**\n\nChoose a segment below or ask your question.`;
 }
 
+export const GEETHA_SYSTEM_PROMPT = `You are Geetha AI, an accessible assistant for the SAMAM AI platform supporting Tamil Nadu citizens.
+Role and tone: Be warm, helpful, encouraging, clear, and respectful.
+Capabilities: Help with Tamil Nadu Government Schemes, scholarships, TNEA counselling, education, career guidance, jobs, nearby essential public services, and accessibility support.
+Language: Automatically detect and seamlessly support English, Tamil, or Tanglish (Tamil written in Latin script). Reply in the user's language whenever possible.
+Response style: Keep answers concise, organized, conversational, and use short bullet points when useful. For changing eligibility, deadlines, or official rules, direct the user to the relevant official portal and do not invent current details.
+Safety: If verified information is unavailable, say that clearly rather than guessing. Protect privacy and never request unnecessary sensitive information.
+Conversation goal: Discover → Understand → Apply → Access.
+Voice: When voice output is enabled, speak responses in en-IN for English and ta-IN for Tamil.`;
+
 interface GeethaChatbotProps { lang: Lang; setLang: (lang: Lang) => void; open?: boolean; onOpenChange?: (open: boolean) => void; }
 
 export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange }: GeethaChatbotProps) {
@@ -118,13 +127,6 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   const voiceFinalRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastSpokenRef = useRef('');
-
-  export const GEETHA_SYSTEM_PROMPT = `You are Geetha AI, an accessible assistant for the SAMAM AI platform supporting Tamil Nadu citizens.
-Role and tone: Be warm, helpful, encouraging, clear, and respectful.
-Capabilities: Help with Tamil Nadu Government Schemes, scholarships, TNEA counselling, education, career guidance, jobs, nearby essential public services, and accessibility support.
-Language: Automatically detect and seamlessly support English, Tamil, or Tanglish (Tamil written in Latin script). Reply in the user's language whenever possible.
-Response style: Keep answers concise, organized, conversational, and use short bullet points when useful. For changing eligibility, deadlines, or official rules, direct the user to the relevant official portal and do not invent current details.
-Safety: If verified information is unavailable, say that clearly rather than guessing. Protect privacy and never request unnecessary sensitive information.`;
 
 
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
@@ -155,6 +157,20 @@ Safety: If verified information is unavailable, say that clearly rather than gue
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     setSpeaking(false);
   }, []);
+
+  const sendMessage = useCallback((text: string) => {
+    if (!text.trim()) return;
+    const clean = text.trim();
+    setMessages(prev => [...prev, { role: 'user', content: clean }]);
+    setInput('');
+    setTyping(true);
+    setTimeout(() => {
+      const response = generateGeethaResponse(clean, chatLang);
+      setMessages(prev => [...prev, { role: 'arthur', content: response }]);
+      setTyping(false);
+      if (voiceOn) speak(response);
+    }, lowData ? 150 : 450);
+  }, [chatLang, lowData, speak, voiceOn]);
 
   const startListening = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -224,19 +240,6 @@ Safety: If verified information is unavailable, say that clearly rather than gue
     return () => document.removeEventListener('open-arthur', handler);
   });
 
-  const sendMessage = useCallback((text: string) => {
-    if (!text.trim()) return;
-    const clean = text.trim();
-    setMessages(prev => [...prev, { role: 'user', content: clean }]);
-    setInput('');
-    setTyping(true);
-    setTimeout(() => {
-      const response = generateGeethaResponse(clean, chatLang);
-      setMessages(prev => [...prev, { role: 'arthur', content: response }]);
-      setTyping(false);
-      if (voiceOn && !lowData) speak(response);
-    }, lowData ? 150 : 450);
-  }, [chatLang, lowData, speak, voiceOn]);
 
   const segments = chatLang === 'en'
     ? [
