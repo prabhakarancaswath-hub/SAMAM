@@ -112,9 +112,19 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceOn, setVoiceOn] = useState(true);
   const recognitionRef = useRef<any>(null);
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const voiceFinalRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastSpokenRef = useRef('');
+
+  const GEETHA_SYSTEM_PROMPT = `You are Geetha AI, an accessible assistant for the SAMAM AI platform supporting Tamil Nadu citizens.
+Role and tone: Be warm, helpful, encouraging, clear, and respectful.
+Capabilities: Help with Tamil Nadu Government Schemes, scholarships, TNEA counselling, education, career guidance, jobs, nearby essential public services, and accessibility support.
+Language: Automatically detect and seamlessly support English, Tamil, or Tanglish (Tamil written in Latin script). Reply in the user's language whenever possible.
+Response style: Keep answers concise, organized, conversational, and use short bullet points when useful. For changing eligibility, deadlines, or official rules, direct the user to the relevant official portal and do not invent current details.
+Safety: If verified information is unavailable, say that clearly rather than guessing. Protect privacy and never request unnecessary sensitive information.`;
 
 
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
@@ -150,20 +160,48 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
     if (recognitionRef.current) recognitionRef.current.stop();
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    voiceFinalRef.current = '';
+    setInput('');
     const recognition = new SpeechRecognition();
     recognition.lang = chatLang === 'ta' ? 'ta-IN' : 'en-IN';
-    recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.maxAlternatives = 1;
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
-    recognition.onerror = () => setListening(false);
+    recognition.onerror = () => {
+      setListening(false);
+      if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    };
     recognition.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript || '';
-      if (transcript.trim()) sendMessage(transcript);
+      let finalText = '';
+      let interimText = '';
+      for (let n = event.resultIndex; n < event.results.length; n++) {
+        const text = event.results[n]?.[0]?.transcript || '';
+        if (event.results[n].isFinal) finalText += text + ' ';
+        else interimText += text;
+      }
+      if (finalText.trim()) voiceFinalRef.current = (voiceFinalRef.current + ' ' + finalText).trim();
+      const combined = (voiceFinalRef.current + ' ' + interimText).trim();
+      setInput(combined);
+
+      if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+      if (combined) {
+        pauseTimerRef.current = setTimeout(() => {
+          const toSend = voiceFinalRef.current.trim() || combined;
+          if (toSend) {
+            recognition.stop();
+            sendMessage(toSend);
+            voiceFinalRef.current = '';
+            setInput('');
+          }
+        }, 1400);
+      }
     };
     recognitionRef.current = recognition;
-    recognition.start();
-  }, [chatLang]);
+    try { recognition.start(); } catch {}
+  }, [chatLang, sendMessage]);
 
   useEffect(() => {
     try { localStorage.setItem('samam-low-data', lowData ? '1' : '0'); } catch {}
@@ -196,9 +234,9 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
       const response = generateGeethaResponse(clean, chatLang);
       setMessages(prev => [...prev, { role: 'arthur', content: response }]);
       setTyping(false);
-      if (!lowData) speak(response);
+      if (voiceOn && !lowData) speak(response);
     }, lowData ? 150 : 450);
-  }, [chatLang, lowData, speak]);
+  }, [chatLang, lowData, speak, voiceOn]);
 
   const segments = chatLang === 'en'
     ? [
@@ -247,7 +285,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {voiceSupported && <button onClick={speaking ? stopSpeaking : () => speak(lastSpokenRef.current || (chatLang === 'ta' ? 'வணக்கம்! நான் கீதா.' : 'Hello! I am Geetha.'))} className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white/80 text-[11px] font-bold"><Volume2 size={13} className="inline mr-1" /> {speaking ? 'STOP' : 'VOICE'}</button>}
+                {voiceSupported && <button onClick={() => { if (speaking) stopSpeaking(); setVoiceOn(v => !v); }} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${voiceOn ? 'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-300/30' : 'bg-white/10 text-white/70'}`} title="Toggle Geetha voice output"><Volume2 size={13} className="inline mr-1" /> {voiceOn ? 'Voice On' : 'Voice Off'}</button>}
                 <button onClick={() => setLowData(v => !v)} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${lowData ? 'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30' : 'bg-white/10 text-white/80'}`} title="Toggle low internet mode">
                   <WifiOff size={13} className="inline mr-1" /> {lowData ? 'LOW DATA ON' : 'LOW DATA'}
                 </button>
@@ -298,7 +336,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               ))}
               {typing && (
                 <div className="flex items-center gap-2 animate-fade-in">
-                  <GeethaAvatar size={34} speaking={speaking && i === messages.length - 1} />
+                  <GeethaAvatar size={34} speaking={speaking} />
                   <div className="bg-white/[.07] border border-white/10 rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex gap-1"><span className="w-2 h-2 rounded-full bg-cyan-300 animate-bounce-soft" /><span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce-soft" style={{ animationDelay: '0.2s' }} /><span className="w-2 h-2 rounded-full bg-fuchsia-400 animate-bounce-soft" style={{ animationDelay: '0.4s' }} /></div>
                   </div>
@@ -307,7 +345,8 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
             </div>
 
             <form onSubmit={e => { e.preventDefault(); sendMessage(input); }} className="flex items-center gap-2 p-3 border-t border-white/10 bg-[#07152c] flex-shrink-0">
-              <input value={input} onChange={e => setInput(e.target.value)} placeholder={chatLang === 'en' ? 'Ask about a scheme, portal or application…' : 'திட்டம், portal அல்லது விண்ணப்பம் பற்றி கேளுங்கள்…'} className="flex-1 px-4 py-3 rounded-xl border border-white/10 bg-white/[.05] text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-300/30 focus:border-cyan-300/40" />
+              <input value={input} onChange={e => setInput(e.target.value)} placeholder={listening ? (chatLang === 'en' ? 'Listening… speak now' : 'கேட்கிறேன்… பேசுங்கள்') : (chatLang === 'en' ? 'Ask about a scheme, portal or application…' : 'திட்டம், portal அல்லது விண்ணப்பம் பற்றி கேளுங்கள்…')} className="flex-1 px-4 py-3 rounded-xl border border-white/10 bg-white/[.05] text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-300/30 focus:border-cyan-300/40" />
+              {voiceSupported && <button type="button" onClick={listening ? () => recognitionRef.current?.stop() : startListening} className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center border ${listening ? 'bg-fuchsia-600/80 border-fuchsia-300/40 animate-pulse' : 'bg-white/[.06] border-white/10'} text-white`} aria-label={listening ? 'Stop voice input' : 'Start voice input'}><Mic size={18} /></button>}
               <button type="submit" disabled={!input.trim()} className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white flex items-center justify-center shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"><Send size={18} /></button>
             </form>
             <div className="px-4 py-2 bg-[#050b19] text-[10px] text-slate-500 flex items-center justify-between">
