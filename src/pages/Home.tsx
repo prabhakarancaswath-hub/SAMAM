@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, GraduationCap, Landmark, MapPin, Mic, Search, ShieldCheck, Wifi, FileText, BriefcaseBusiness, Route, Languages, Accessibility as AccessibilityIcon, Bell, HeartHandshake } from 'lucide-react';
+import { ArrowRight, Bot, GraduationCap, Landmark, Mic, Search, ShieldCheck, Wifi, FileText, BriefcaseBusiness, Route, Languages, Accessibility as AccessibilityIcon, Bell, HeartHandshake } from 'lucide-react';
 import type { Lang } from '@/i18n/translations';
 import { bi } from '@/i18n/bilingual';
 import type { Page } from '@/components/Navbar';
@@ -24,7 +24,6 @@ export function Home({ lang, setPage }: HomeProps) {
   { icon: Route, title:bi(lang,'TNEA & Education','TNEA & கல்வி'), sub:bi(lang,'College & counselling','கல்லூரி & கலந்தாய்வு'), page:'tnea' as Page },
   { icon: BriefcaseBusiness, title:bi(lang,'Career Opportunities','தொழில் வாய்ப்புகள்'), sub:bi(lang,'Skills, jobs & internships','திறன்கள், வேலை & பயிற்சிகள்'), page:'careers' as Page },
   { icon: FileText, title:bi(lang,'Services Directory','சேவை அடைவு'), sub:bi(lang,'Essential public services','முக்கிய பொது சேவைகள்'), page:'services' as Page },
-  { icon: MapPin, title:bi(lang,'Interactive Maps','ஊடாடும் வரைபடங்கள்'), sub:bi(lang,'Nearby support & facilities','அருகிலுள்ள ஆதரவு & வசதிகள்'), page:'maps' as Page },
   { icon: AccessibilityIcon, title:bi(lang,'Accessibility','அணுகல்'), sub:bi(lang,'Low data & easier access','குறைந்த தரவு & எளிய அணுகல்'), page:'accessibility' as Page },
  ];
  const schemes = [
@@ -57,13 +56,12 @@ export function Home({ lang, setPage }: HomeProps) {
     </div>
     <div className="mt-8 flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-widest text-violet-300">{bi(lang,'Government Support','அரசு ஆதரவு')}</p><h2 className="mt-1 text-2xl font-black">{bi(lang,'Start with a verified pathway','சரிபார்க்கப்பட்ட பாதையில் தொடங்குங்கள்')}</h2></div><button onClick={()=>setPage('scholarships')} className="text-xs font-bold text-cyan-300">{bi(lang,'View schemes →','திட்டங்களைப் பார்க்க →')}</button></div>
     <div className="mt-4 grid gap-3 md:grid-cols-3">{schemes.map(([name,desc,c])=><button key={name} onClick={()=>setPage('scholarships')} className="samam-scheme-card text-left"><span className={'flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br '+c}><GraduationCap size={19}/></span><b className="mt-3 block text-sm">{name}</b><span className="mt-1 block text-xs leading-5 text-slate-400">{desc}</span><span className="mt-3 block text-xs font-bold text-cyan-300">{bi(lang,'Open guidance →','வழிகாட்டியைத் திற →')}</span></button>)}</div>
-    <div className="mt-8 grid gap-3 sm:grid-cols-3">
-     <button onClick={()=>setPage('maps')} className="samam-info-card"><MapPin/><span><b>{bi(lang,'Nearby Support','அருகிலுள்ள ஆதரவு')}</b><small>{bi(lang,'Find offices, centres and services','அலுவலகங்கள், மையங்கள் மற்றும் சேவைகளைக் கண்டறியுங்கள்')}</small></span></button>
+    <div className="mt-8 grid gap-3 sm:grid-cols-2">
      <button onClick={()=>setPage('accessibility')} className="samam-info-card"><AccessibilityIcon/><span><b>{bi(lang,'Accessibility','அணுகல்')}</b><small>{bi(lang,'Low data, text and motion controls','குறைந்த தரவு, எழுத்து மற்றும் இயக்க கட்டுப்பாடுகள்')}</small></span></button>
      <button onClick={()=>document.dispatchEvent(new CustomEvent('open-arthur'))} className="samam-info-card"><Bot/><span><b>{bi(lang,'Geetha + Voice','கீதா + குரல்')}</b><small>{bi(lang,'Ask in English or Tamil','தமிழ் அல்லது ஆங்கிலத்தில் கேளுங்கள்')}</small></span></button>
     </div>
    </div>
   </div>
-  <div className="samam-mobile-bottom md:hidden"><button onClick={()=>setPage('home')}><Landmark/><span>{bi(lang,'Home','முகப்பு')}</span></button><button onClick={()=>document.dispatchEvent(new CustomEvent('open-arthur'))}><Bot/><span>Arthur</span></button><button onClick={()=>setPage('careers')}><BriefcaseBusiness/><span>{bi(lang,'Career','தொழில்')}</span></button><button onClick={()=>setPage('maps')}><MapPin/><span>{bi(lang,'Maps','வரைபடம்')}</span></button></div>
+  <div className="samam-mobile-bottom md:hidden"><button onClick={()=>setPage('home')}><Landmark/><span>{bi(lang,'Home','முகப்பு')}</span></button><button onClick={()=>document.dispatchEvent(new CustomEvent('open-arthur'))}><Bot/><span>Arthur</span></button><button onClick={()=>setPage('careers')}><BriefcaseBusiness/><span>{bi(lang,'Career','தொழில்')}</span></button><button onClick={()=>setPage('accessibility')}><AccessibilityIcon/><span>{bi(lang,'Access','அணுகல்')}</span></button></div>
  </div>;
 }
