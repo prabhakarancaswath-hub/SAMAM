@@ -6,16 +6,16 @@ import type { Page } from '@/components/Navbar';
 interface HomeProps { lang: Lang; setPage: (p: Page) => void; onGeetha: () => void; }
 
 function GeethaHero({lang,onGeetha}:{lang:Lang;onGeetha:()=>void}) {
- return <div className="samam-arthur-card">
+ return <button type="button" onClick={onGeetha} aria-label={bi(lang,'Open Geetha AI','கீதா AI-ஐ திறக்கவும்')} className="samam-arthur-card text-left w-full cursor-pointer">
   <div className="samam-arthur-glow" />
-  <div className="samam-arthur-avatar"><span>👩‍💼</span><i>A</i></div>
+  <div className="samam-arthur-avatar"><span>👩‍💼</span><i>G</i></div>
   <div className="samam-arthur-copy">
    <div className="flex items-center gap-2"><span className="samam-live-dot"/> <span className="text-xs font-bold text-cyan-200">GEETHA AI • {bi(lang,'ONLINE','ஆன்லைன்')}</span></div>
    <h2 className="mt-1 text-2xl font-black">Geetha AI</h2>
    <p className="mt-1 text-sm leading-5 text-slate-300">{bi(lang,'Your guide to equal access — schemes, education, careers, services and support.','சம அணுகலுக்கான உங்கள் வழிகாட்டி — திட்டங்கள், கல்வி, தொழில், சேவைகள் மற்றும் ஆதரவு.')}</p>
-   <button onClick={onGeetha} className="mt-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-4 py-2 text-sm font-bold shadow-lg">{bi(lang,'Ask Geetha','கீதாவிடம் கேளுங்கள்')} <ArrowRight size={15} className="inline ml-1"/></button>
+   <span className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-4 py-2 text-sm font-bold shadow-lg">{bi(lang,'Ask Geetha','கீதாவிடம் கேளுங்கள்')} <ArrowRight size={15} className="ml-1"/></span>
   </div>
- </div>;
+ </div></button>;
 }
 
 export function Home({ lang, setPage, onGeetha }: HomeProps) {
