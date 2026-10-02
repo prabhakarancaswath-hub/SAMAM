@@ -10,7 +10,7 @@ function GeethaHero({lang}:{lang:Lang}) {
   <div className="samam-arthur-glow" />
   <div className="samam-arthur-avatar"><span>👩‍💼</span><i>A</i></div>
   <div className="samam-arthur-copy">
-   <div className="flex items-center gap-2"><span className="samam-live-dot"/> <span className="text-xs font-bold text-cyan-200">ARTHUR • {bi(lang,'ONLINE','ஆன்லைன்')}</span></div>
+   <div className="flex items-center gap-2"><span className="samam-live-dot"/> <span className="text-xs font-bold text-cyan-200">GEETHA AI • {bi(lang,'ONLINE','ஆன்லைன்')}</span></div>
    <h2 className="mt-1 text-2xl font-black">Geetha AI</h2>
    <p className="mt-1 text-sm leading-5 text-slate-300">{bi(lang,'Your guide to equal access — schemes, education, careers, services and support.','சம அணுகலுக்கான உங்கள் வழிகாட்டி — திட்டங்கள், கல்வி, தொழில், சேவைகள் மற்றும் ஆதரவு.')}</p>
    <button onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="mt-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-4 py-2 text-sm font-bold shadow-lg">{bi(lang,'Ask Geetha','கீதாவிடம் கேளுங்கள்')} <ArrowRight size={15} className="inline ml-1"/></button>
@@ -37,7 +37,7 @@ export function Home({ lang, setPage }: HomeProps) {
    <div className="mx-auto max-w-6xl">
     <div className="flex items-center justify-between">
      <div><p className="text-xs font-bold text-cyan-300">SAMAM AI • EQUAL ACCESS</p><h1 className="mt-1 text-3xl md:text-4xl font-black">{bi(lang,'Equal Access • Stronger Communities','சம அணுகல் • வலுவான சமூகங்கள்')}</h1><p className="mt-2 max-w-2xl text-sm text-slate-400">{bi(lang,'One accessible place to discover government support, education pathways, career opportunities and essential services.','அரசு ஆதரவு, கல்விப் பாதைகள், தொழில் வாய்ப்புகள் மற்றும் அத்தியாவசிய சேவைகளை ஒரே இடத்தில் எளிதாகக் கண்டறியுங்கள்.')}</p></div>
-     <button aria-label="Arthur" onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="rounded-2xl bg-white/10 p-3 ring-1 ring-white/10"><Bot className="text-cyan-300"/></button>
+     <button aria-label="Geetha AI" onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="rounded-2xl bg-white/10 p-3 ring-1 ring-white/10"><Bot className="text-cyan-300"/></button>
     </div>
     <button onClick={() => document.dispatchEvent(new CustomEvent('open-arthur'))} className="mt-5 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[.04] p-3 text-left"><Search size={18} className="text-slate-400"/><span className="flex-1 text-sm text-slate-400">{bi(lang,'Ask Geetha about schemes, TNEA, careers, services or nearby support...','திட்டங்கள், TNEA, தொழில், சேவைகள் அல்லது அருகிலுள்ள ஆதரவு பற்றி கீதாவிடம் கேளுங்கள்...')}</span><Mic size={18} className="text-cyan-300"/></button>
     <GeethaHero lang={lang}/>
@@ -46,7 +46,7 @@ export function Home({ lang, setPage }: HomeProps) {
     <div className="mt-7 overflow-hidden rounded-3xl border border-cyan-300/15 bg-gradient-to-r from-violet-900/40 to-cyan-900/30 p-5">
      <div className="flex items-center gap-2 text-cyan-200"><ShieldCheck size={17}/><span className="text-xs font-black uppercase tracking-widest">{bi(lang,'THE SAMAM CORE','SAMAM மையம்')}</span></div>
      <h2 className="mt-2 text-xl md:text-2xl font-black">{bi(lang,'Discover → Understand → Apply → Access','கண்டறி → புரிந்துகொள் → விண்ணப்பி → அணுகு')}</h2>
-     <p className="mt-2 text-sm leading-6 text-slate-300">{bi(lang,'Arthur helps users understand eligibility, find official sources, prepare for applications, explore education and career pathways, locate services and reach nearby support — in Tamil or English.','தகுதியைப் புரிந்துகொள்ள, அதிகாரப்பூர்வ ஆதாரங்களைக் கண்டறிய, விண்ணப்பத்திற்குத் தயாராக, கல்வி மற்றும் தொழில் பாதைகளை ஆராய, சேவைகளைத் தேட மற்றும் அருகிலுள்ள ஆதரவை அடைய கீதா தமிழ் அல்லது ஆங்கிலத்தில் உதவுகிறார்.')}</p>
+     <p className="mt-2 text-sm leading-6 text-slate-300">{bi(lang,'Geetha helps users understand eligibility, find official sources, prepare for applications, explore education and career pathways, locate services and reach nearby support — in Tamil or English.','தகுதியைப் புரிந்துகொள்ள, அதிகாரப்பூர்வ ஆதாரங்களைக் கண்டறிய, விண்ணப்பத்திற்குத் தயாராக, கல்வி மற்றும் தொழில் பாதைகளை ஆராய, சேவைகளைத் தேட மற்றும் அருகிலுள்ள ஆதரவை அடைய கீதா தமிழ் அல்லது ஆங்கிலத்தில் உதவுகிறார்.')}</p>
      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
       <button onClick={()=>setPage('scholarships')} className="rounded-xl bg-white/5 border border-white/10 p-3 text-left"><Landmark className="mb-2 text-violet-300" size={18}/><b>{bi(lang,'Schemes','திட்டங்கள்')}</b><span className="block text-slate-400 mt-1">{bi(lang,'Find support','ஆதரவை கண்டறி')}</span></button>
       <button onClick={()=>setPage('tnea')} className="rounded-xl bg-white/5 border border-white/10 p-3 text-left"><Route className="mb-2 text-cyan-300" size={18}/><b>TNEA</b><span className="block text-slate-400 mt-1">{bi(lang,'Education path','கல்விப் பாதை')}</span></button>
@@ -62,6 +62,6 @@ export function Home({ lang, setPage }: HomeProps) {
     </div>
    </div>
   </div>
-  <div className="samam-mobile-bottom md:hidden"><button onClick={()=>setPage('home')}><Landmark/><span>{bi(lang,'Home','முகப்பு')}</span></button><button onClick={()=>document.dispatchEvent(new CustomEvent('open-arthur'))}><Bot/><span>Arthur</span></button><button onClick={()=>setPage('careers')}><BriefcaseBusiness/><span>{bi(lang,'Career','தொழில்')}</span></button><button onClick={()=>setPage('accessibility')}><AccessibilityIcon/><span>{bi(lang,'Access','அணுகல்')}</span></button></div>
+  <div className="samam-mobile-bottom md:hidden"><button onClick={()=>setPage('home')}><Landmark/><span>{bi(lang,'Home','முகப்பு')}</span></button><button onClick={()=>document.dispatchEvent(new CustomEvent('open-arthur'))}><Bot/><span>Geetha</span></button><button onClick={()=>setPage('careers')}><BriefcaseBusiness/><span>{bi(lang,'Career','தொழில்')}</span></button><button onClick={()=>setPage('accessibility')}><AccessibilityIcon/><span>{bi(lang,'Access','அணுகல்')}</span></button></div>
  </div>;
 }
