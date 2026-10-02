@@ -131,6 +131,38 @@ async function getGuideResponse(input: string, lang: Lang): Promise<string | nul
   return null;
 }
 
+interface TrainingRow { id: string; category: string; language: 'en' | 'ta' | 'mixed'; question: string; answer: string; source?: string | null; }
+
+function trainingTokens(text: string): string[] {
+  return text.toLowerCase().split(/[^a-z0-9\\u0B80-\\u0BFF]+/i).filter(x => x.length >= 2);
+}
+
+async function getTrainingResponse(input: string, lang: Lang): Promise<string | null> {
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase
+      .from('geetha_training_examples')
+      .select('id,category,language,question,answer,source')
+      .limit(100);
+    if (error || !data?.length) return null;
+    const rows = data as TrainingRow[];
+    const inputTokens = trainingTokens(input);
+    const candidates = rows.filter(row => row.language === lang || row.language === 'mixed' || (lang === 'ta' && row.language === 'ta') || (lang === 'en' && row.language === 'en'));
+    let best: TrainingRow | null = null;
+    let bestScore = 0;
+    for (const row of candidates) {
+      const qTokens = trainingTokens(row.question);
+      const score = qTokens.reduce((sum, token) => sum + (inputTokens.includes(token) ? 1 : 0), 0);
+      const normalized = row.question.toLowerCase();
+      const bonus = input.toLowerCase().includes(normalized) || normalized.includes(input.toLowerCase()) ? 3 : 0;
+      if (score + bonus > bestScore) { bestScore = score + bonus; best = row; }
+    }
+    return best && bestScore >= 2 ? best.answer : null;
+  } catch {
+    return null;
+  }
+}
+
 interface GeethaChatbotProps { lang: Lang; setLang: (lang: Lang) => void; open?: boolean; onOpenChange?: (open: boolean) => void; }
 
 export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange }: GeethaChatbotProps) {
@@ -176,7 +208,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     setInput('');
     setTyping(true);
     setTimeout(async () => {
-      const response = (await getGuideResponse(text, chatLang)) ?? generateGeethaResponse(text, chatLang);
+      const response = (await getGuideResponse(text, chatLang)) ?? (await getTrainingResponse(text, chatLang)) ?? generateGeethaResponse(text, chatLang);
       setMessages(prev => [...prev, { role: 'arthur', content: response }]);
       setTyping(false);
     }, lowData ? 150 : 450);
