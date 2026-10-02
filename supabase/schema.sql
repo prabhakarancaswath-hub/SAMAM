@@ -224,3 +224,43 @@ where not exists (
   select 1 from public.knowledge_documents
   where title='Scholarship Guide 2026–27 — Geetha Knowledge'
 );
+
+
+-- Geetha training dataset: curated bilingual examples used as free retrieval-based training data.
+create table if not exists public.geetha_training_examples (
+  id uuid primary key default gen_random_uuid(),
+  category text not null,
+  language text not null check (language in ('en','ta','mixed')),
+  question text not null,
+  answer text not null,
+  source text,
+  verification_status text not null default 'curated',
+  created_at timestamptz not null default now()
+);
+
+alter table public.geetha_training_examples enable row level security;
+drop policy if exists "Public can read Geetha training examples" on public.geetha_training_examples;
+create policy "Public can read Geetha training examples" on public.geetha_training_examples for select using (true);
+
+insert into public.geetha_training_examples (category,language,question,answer,source) values
+('greeting','en','Hello Geetha','Hello! I am Geetha AI. I can help with scholarships, government schemes, TNEA, skills, jobs and application guidance.','SAMAM curated'),
+('greeting','ta','வணக்கம் கீதா','வணக்கம்! நான் Geetha AI. உதவித்தொகை, அரசு திட்டங்கள், TNEA, திறன்கள், வேலை வாய்ப்புகள் மற்றும் விண்ணப்ப வழிகாட்டுதலில் உதவ முடியும்.','SAMAM curated'),
+('government_schemes','en','How can I find a government scheme?','Start with the official scheme name, check eligibility, use the official source, prepare the required documents, submit through the official portal and save the application reference number.','SAMAM curated'),
+('government_schemes','ta','அரசு திட்டத்தை எப்படி கண்டுபிடிப்பது?','அதிகாரப்பூர்வ திட்டப் பெயரை கண்டறிந்து, தகுதியை சரிபார்த்து, அதிகாரப்பூர்வ portal-ஐ பயன்படுத்தி, தேவையான ஆவணங்களை தயார் செய்து, விண்ணப்ப reference number-ஐ சேமிக்கவும்.','SAMAM curated'),
+('scholarships','en','How do I find scholarships?','Use SAMAM’s scholarship information to identify relevant schemes, then verify the current eligibility, deadline and application route on the official portal before applying.','SAMAM curated'),
+('scholarships','ta','உதவித்தொகை எப்படி தேடுவது?','SAMAM-ன் உதவித்தொகை தகவல்களில் பொருத்தமான திட்டங்களைப் பார்க்கலாம். விண்ணப்பிக்கும் முன் தற்போதைய தகுதி, கடைசி தேதி மற்றும் விண்ணப்ப வழியை அதிகாரப்பூர்வ portal-ல் சரிபார்க்கவும்.','SAMAM curated'),
+('eligibility','en','What documents are usually needed for a scholarship?','Common documents can include identity proof, marksheets, admission or bonafide proof, fee details, income/community certificates and bank details. Exact requirements depend on the scheme.','SAMAM curated'),
+('eligibility','ta','உதவித்தொகைக்கு என்ன ஆவணங்கள் தேவை?','பொதுவாக அடையாளச் சான்று, மதிப்பெண் சான்றிதழ்கள், சேர்க்கை அல்லது bonafide சான்று, கட்டண விவரம், வருமானம்/சமூகச் சான்றிதழ்கள் மற்றும் வங்கி விவரங்கள் தேவைப்படலாம். சரியான பட்டியல் திட்டத்தைப் பொறுத்தது.','SAMAM curated'),
+('application','en','How do I apply for a scheme?','Check eligibility, open the official portal, prepare documents, complete the form carefully, submit it, save the reference number and track the status on the official portal.','SAMAM curated'),
+('application','ta','திட்டத்திற்கு எப்படி விண்ணப்பிப்பது?','தகுதியை சரிபார்த்து, அதிகாரப்பூர்வ portal-ஐ திறந்து, ஆவணங்களை தயார் செய்து, படிவத்தை கவனமாக நிரப்பி, சமர்ப்பித்த பின் reference number-ஐ சேமித்து status-ஐ அதிகாரப்பூர்வ portal-ல் பார்க்கவும்.','SAMAM curated'),
+('tnea','en','What is the TNEA process?','The basic flow is registration, certificate verification, choice filling, allotment and reporting to the allotted college. Check the official TNEA portal for current dates and rules.','SAMAM curated'),
+('tnea','ta','TNEA நடைமுறை என்ன?','அடிப்படை நடைமுறை பதிவு, சான்றிதழ் சரிபார்ப்பு, விருப்பத் தேர்வு, allotment மற்றும் ஒதுக்கப்பட்ட கல்லூரியில் சேருதல். தற்போதைய தேதிகள் மற்றும் விதிகளுக்கு அதிகாரப்பூர்வ TNEA portal-ஐ சரிபார்க்கவும்.','SAMAM curated'),
+('skills','en','Where can I learn skills for free?','SAMAM can guide you toward free or low-cost learning options such as SWAYAM and NPTEL. Check the provider’s current course details before enrolling.','SAMAM curated'),
+('skills','ta','இலவசமாக திறன்களை எங்கே கற்கலாம்?','SWAYAM மற்றும் NPTEL போன்ற இலவச அல்லது குறைந்த செலவு கற்றல் தளங்களை SAMAM மூலம் அறியலாம். சேர்வதற்கு முன் தற்போதைய course விவரங்களை provider-ன் தளத்தில் சரிபார்க்கவும்.','SAMAM curated'),
+('jobs','en','Where can I find jobs or internships?','Use SAMAM’s Jobs and Careers sections to explore opportunities. Before applying, verify the organisation, role and application link from an official or trusted source.','SAMAM curated'),
+('jobs','ta','வேலை அல்லது internship எங்கே தேடுவது?','SAMAM-ன் Jobs மற்றும் Careers பகுதிகளில் வாய்ப்புகளைப் பார்க்கலாம். விண்ணப்பிக்கும் முன் நிறுவனம், பணி மற்றும் application link-ஐ அதிகாரப்பூர்வ அல்லது நம்பகமான மூலத்தில் சரிபார்க்கவும்.','SAMAM curated'),
+('low_data','en','How does low data mode work?','Low-data mode keeps Geetha’s guidance lightweight and relies on locally available information where possible. Live government updates and final submissions still require internet access.','SAMAM curated'),
+('low_data','ta','குறைந்த data mode எப்படி வேலை செய்கிறது?','குறைந்த data mode Geetha வழிகாட்டுதலை எளிமையாக வைத்துக்கொண்டு, முடிந்தவரை உள்ளூர் தகவலைப் பயன்படுத்துகிறது. அரசு தளத்தின் live updates மற்றும் இறுதி submission-க்கு இணையம் தேவை.','SAMAM curated'),
+('sdg10','en','What is SAMAM trying to solve?','SAMAM supports SDG 10 by making opportunity information and guidance easier to access across scholarships, education, skills, jobs and government services.','SAMAM curated'),
+('sdg10','ta','SAMAM என்ன பிரச்சினையை தீர்க்கிறது?','உதவித்தொகை, கல்வி, திறன்கள், வேலை மற்றும் அரசு சேவைகள் பற்றிய தகவல் மற்றும் வழிகாட்டுதலை எளிதாக அணுக உதவுவதன் மூலம் SAMAM SDG 10-ஐ ஆதரிக்கிறது.','SAMAM curated')
+ on conflict do nothing;
