@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles } from 'lucide-react';
+import { X, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles, Mic, Volume2, Square, MessageCircle } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
 
@@ -11,20 +11,24 @@ interface Scheme {
 const schemes = schemesData as Scheme[];
 interface ChatMessage { role: 'user' | 'arthur'; content: string; }
 
-function GeethaAvatar({ size = 44, large = false }: { size?: number; large?: boolean }) {
+function GeethaAvatar({ size = 44, large = false, speaking = false, listening = false }: { size?: number; large?: boolean; speaking?: boolean; listening?: boolean }) {
   return (
-    <div className={`geetha-avatar relative flex items-center justify-center flex-shrink-0 ${large ? 'geetha-avatar-large' : ''}`} style={{ width: size, height: size }} aria-label="Geetha AI assistant">
+    <div
+      className={`geetha-avatar relative flex items-center justify-center flex-shrink-0 ${large ? 'geetha-avatar-large' : ''} ${speaking ? 'geetha-speaking' : ''} ${listening ? 'geetha-listening' : ''}`}
+      style={{ width: size, height: size }}
+      aria-label="Geetha AI woman assistant"
+    >
       <div className="geetha-avatar-ring" />
-      <div className="geetha-mini-ear left" />
-      <div className="geetha-mini-ear right" />
-      <div className="geetha-mini-head">
-        <div className="geetha-mini-eye left" />
-        <div className="geetha-mini-eye right" />
-        <div className="geetha-mini-trunk" />
-        <div className="geetha-mini-headset" />
-        <div className="geetha-mini-hair" />
-        <div className="geetha-mini-lip" />
+      <div className="geetha-hair" />
+      <div className="geetha-face">
+        <span className="geetha-brow left" />
+        <span className="geetha-brow right" />
+        <span className="geetha-eye left" />
+        <span className="geetha-eye right" />
+        <span className="geetha-mouth" />
       </div>
+      <div className="geetha-shoulders"><span>G</span></div>
+      {(speaking || listening) && <div className="geetha-wave" />}
     </div>
   );
 }
@@ -105,7 +109,13 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const [lowData, setLowData] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastSpokenRef = useRef('');
+
 
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = (val: boolean) => { if (onOpenChange) onOpenChange(val); else setInternalOpen(val); };
@@ -113,7 +123,47 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
 
   useEffect(() => {
     try { setLowData(localStorage.getItem('samam-low-data') === '1'); } catch {}
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setVoiceSupported(!!SpeechRecognition && 'speechSynthesis' in window);
   }, []);
+
+  const speak = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*#•]/g, ' '));
+    utterance.lang = chatLang === 'ta' ? 'ta-IN' : 'en-IN';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.02;
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    lastSpokenRef.current = text;
+    window.speechSynthesis.speak(utterance);
+  }, [chatLang]);
+
+  const stopSpeaking = useCallback(() => {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setSpeaking(false);
+  }, []);
+
+  const startListening = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    if (recognitionRef.current) recognitionRef.current.stop();
+    const recognition = new SpeechRecognition();
+    recognition.lang = chatLang === 'ta' ? 'ta-IN' : 'en-IN';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => setListening(false);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[0]?.[0]?.transcript || '';
+      if (transcript.trim()) sendMessage(transcript);
+    };
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [chatLang]);
 
   useEffect(() => {
     try { localStorage.setItem('samam-low-data', lowData ? '1' : '0'); } catch {}
@@ -138,15 +188,17 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
 
   const sendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', content: text.trim() }]);
+    const clean = text.trim();
+    setMessages(prev => [...prev, { role: 'user', content: clean }]);
     setInput('');
     setTyping(true);
     setTimeout(() => {
-      const response = generateGeethaResponse(text, chatLang);
+      const response = generateGeethaResponse(clean, chatLang);
       setMessages(prev => [...prev, { role: 'arthur', content: response }]);
       setTyping(false);
+      if (!lowData) speak(response);
     }, lowData ? 150 : 450);
-  }, [chatLang, lowData]);
+  }, [chatLang, lowData, speak]);
 
   const segments = chatLang === 'en'
     ? [
@@ -173,24 +225,29 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 bg-gradient-to-br from-slate-950 via-violet-950 to-cyan-900 text-white px-4 py-3 rounded-2xl shadow-xl shadow-violet-500/20 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 animate-fade-in" aria-label="Open Geetha AI">
-          <GeethaAvatar size={40} />
-          <span className="font-semibold text-sm hidden sm:inline">Ask Geetha AI</span>
+        <button
+          onClick={() => { setOpen(true); setTimeout(() => speak(chatLang === 'ta' ? 'வணக்கம்! நான் கீதா. உங்களுக்கு எப்படி உதவலாம்?' : 'Hello! I am Geetha. How can I help you?'), 180); }}
+          className="fixed bottom-6 right-5 z-50 group flex flex-col items-center gap-1 text-white"
+          aria-label="Open Geetha AI"
+        >
+          <div className="geetha-launcher"><GeethaAvatar size={70} large /></div>
+          <span className="px-3 py-1 rounded-full bg-slate-950/90 border border-cyan-300/20 text-xs font-bold shadow-lg">Ask Geetha AI</span>
         </button>
       )}
 
       {open && (
-        <div className={`fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-[430px] max-w-full animate-slide-in-right ${lowData ? 'low-data-mode' : ''}`}>
-          <div className="flex flex-col bg-[#071025] text-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-cyan-300/15 overflow-hidden" style={{ height: 'min(720px, 90vh)' }}>
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/80 backdrop-blur-md ${lowData ? 'low-data-mode' : ''}`}>
+          <div className="flex flex-col bg-[#071025] text-white rounded-3xl shadow-2xl border border-cyan-300/15 overflow-hidden w-full max-w-[980px]" style={{ height: 'min(820px, 94vh)' }}>
             <div className="flex items-center justify-between bg-gradient-to-r from-[#080d24] via-[#25105d] to-[#063d55] px-4 py-3.5 flex-shrink-0">
               <div className="flex items-center gap-3">
-                <GeethaAvatar size={48} large />
+                <GeethaAvatar size={54} large speaking={speaking} listening={listening} />
                 <div>
                   <p className="font-black text-white text-base leading-none">Geetha AI</p>
                   <p className="text-cyan-100/70 text-xs mt-1">Government • Scholarships • Guidance</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {voiceSupported && <button onClick={speaking ? stopSpeaking : () => speak(lastSpokenRef.current || (chatLang === 'ta' ? 'வணக்கம்! நான் கீதா.' : 'Hello! I am Geetha.'))} className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white/80 text-[11px] font-bold"><Volume2 size={13} className="inline mr-1" /> {speaking ? 'STOP' : 'VOICE'}</button>}
                 <button onClick={() => setLowData(v => !v)} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${lowData ? 'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30' : 'bg-white/10 text-white/80'}`} title="Toggle low internet mode">
                   <WifiOff size={13} className="inline mr-1" /> {lowData ? 'LOW DATA ON' : 'LOW DATA'}
                 </button>
@@ -201,7 +258,19 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               </div>
             </div>
 
-            <div className="px-4 pt-3 pb-2 bg-[#08142b] border-b border-white/10">
+            <div className="geetha-center-stage">
+  <div className="geetha-orbit geetha-orbit-one" />
+  <div className="geetha-orbit geetha-orbit-two" />
+  <div className="geetha-center-avatar"><GeethaAvatar size={170} large speaking={speaking} listening={listening} /></div>
+  <div className="geetha-status">{listening ? (chatLang === 'ta' ? 'கீதா கேட்கிறார்…' : 'Geetha is listening…') : speaking ? (chatLang === 'ta' ? 'கீதா பேசுகிறார்…' : 'Geetha is speaking…') : (chatLang === 'ta' ? 'கீதாவிடம் பேசுங்கள்' : 'Talk with Geetha')}</div>
+  <div className="flex items-center justify-center gap-3 mt-3">
+    {voiceSupported && <button onClick={listening ? () => recognitionRef.current?.stop() : startListening} className={`geetha-mic-button ${listening ? 'active' : ''}`} aria-label={listening ? 'Stop listening' : 'Speak to Geetha'}>{listening ? <Square size={20} /> : <Mic size={22} />}</button>}
+    {speaking && <button onClick={stopSpeaking} className="geetha-stop-button" aria-label="Stop Geetha speech"><Square size={17} /></button>}
+  </div>
+  {!voiceSupported && <p className="text-[11px] text-slate-500 mt-2">{t(chatLang, 'voiceUnsupported')}</p>}
+</div>
+
+<div className="px-4 pt-3 pb-2 bg-[#08142b] border-b border-white/10">
               <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                 {segments.map(([label, prompt, Icon]) => (
                   <button key={label} onClick={() => sendMessage(prompt)} className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[.05] ring-1 ring-white/10 hover:bg-cyan-400/10 hover:ring-cyan-300/30 text-xs font-semibold text-slate-200 transition-all">
@@ -214,7 +283,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#061022]">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
-                  {msg.role === 'arthur' && <GeethaAvatar size={30} />}
+                  {msg.role === 'arthur' && <GeethaAvatar size={34} speaking={speaking && i === messages.length - 1} />}
                   <div className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-gradient-to-r from-violet-600 to-cyan-500 text-white rounded-br-md ml-2' : 'bg-white/[.07] text-slate-100 rounded-bl-md ml-2 border border-white/10 shadow-sm'}`}>
                     {msg.content.split('\n').map((line, j) => {
                       const parts = line.split(/(\*\*.+?\*\*)/g);
@@ -229,7 +298,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               ))}
               {typing && (
                 <div className="flex items-center gap-2 animate-fade-in">
-                  <GeethaAvatar size={30} />
+                  <GeethaAvatar size={34} speaking={speaking && i === messages.length - 1} />
                   <div className="bg-white/[.07] border border-white/10 rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex gap-1"><span className="w-2 h-2 rounded-full bg-cyan-300 animate-bounce-soft" /><span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce-soft" style={{ animationDelay: '0.2s' }} /><span className="w-2 h-2 rounded-full bg-fuchsia-400 animate-bounce-soft" style={{ animationDelay: '0.4s' }} /></div>
                   </div>
