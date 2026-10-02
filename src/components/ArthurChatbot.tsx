@@ -180,12 +180,16 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     voiceFinalRef.current = '';
     setInput('');
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = chatLang === 'ta' ? 'ta-IN' : 'en-IN';
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.maxAlternatives = 1;
     recognition.onstart = () => setListening(true);
-    recognition.onend = () => setListening(false);
+    recognition.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
     recognition.onerror = () => {
       setListening(false);
       if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
@@ -215,8 +219,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
         }, 1400);
       }
     };
-    recognitionRef.current = recognition;
-    try { recognition.start(); } catch {}
+    try { recognition.start(); } catch { setListening(false); }
   }, [chatLang, sendMessage]);
 
   useEffect(() => {
@@ -267,7 +270,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     <>
       {!open && (
         <button
-          onClick={() => { setOpen(true); setTimeout(() => speak(chatLang === 'ta' ? 'வணக்கம்! நான் கீதா. உங்களுக்கு எப்படி உதவலாம்?' : 'Hello! I am Geetha. How can I help you?'), 180); }}
+          onClick={() => setOpen(true)}
           className="fixed bottom-6 right-5 z-50 group flex flex-col items-center gap-1 text-white"
           aria-label="Open Geetha AI"
         >
@@ -299,7 +302,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               </div>
             </div>
 
-            <div className="geetha-center-stage">
+            {messages.length <= 1 && <div className="geetha-center-stage">
   <div className="geetha-orbit geetha-orbit-one" />
   <div className="geetha-orbit geetha-orbit-two" />
   <div className="geetha-center-avatar"><GeethaAvatar size={170} large speaking={speaking} listening={listening} /></div>
@@ -309,7 +312,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     {speaking && <button onClick={stopSpeaking} className="geetha-stop-button" aria-label="Stop Geetha speech"><Square size={17} /></button>}
   </div>
   {!voiceSupported && <p className="text-[11px] text-slate-500 mt-2">{t(chatLang, 'voiceUnsupported')}</p>}
-</div>
+</div>}
 
 <div className="px-4 pt-3 pb-2 bg-[#08142b] border-b border-white/10">
               <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
