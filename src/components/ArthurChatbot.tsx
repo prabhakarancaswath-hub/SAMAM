@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles, Mic, Volume2, Square, MessageCircle } from 'lucide-react';
+import { X, ArrowLeft, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles, Mic, Volume2, Square, MessageCircle } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
 
@@ -280,22 +280,23 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
       )}
 
       {open && (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/80 backdrop-blur-md ${lowData ? 'low-data-mode' : ''}`}>
-          <div className="flex flex-col bg-[#071025] text-white rounded-3xl shadow-2xl border border-cyan-300/15 overflow-hidden w-full max-w-[980px]" style={{ height: 'min(820px, 94vh)' }}>
+        <div className={`fixed inset-0 z-[100] flex items-stretch justify-stretch bg-[#071025] ${lowData ? 'low-data-mode' : ''}`} style={{ height: '100dvh', width: '100vw' }}>
+          <div className="flex flex-col bg-[#071025] text-white rounded-none shadow-none border-0 overflow-hidden w-full max-w-none min-h-0" style={{ height: '100dvh', minHeight: '100dvh' }}>
             <div className="flex items-center justify-between bg-gradient-to-r from-[#080d24] via-[#25105d] to-[#063d55] px-4 py-3.5 flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <GeethaAvatar size={54} large speaking={speaking} listening={listening} />
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <button onClick={() => setOpen(false)} className="flex-shrink-0 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white" aria-label={chatLang === 'ta' ? 'பின்செல்' : 'Go back'} title={chatLang === 'ta' ? 'பின்செல்' : 'Go back'}><ArrowLeft size={20} /></button>
+                <GeethaAvatar size={48} large speaking={speaking} listening={listening} />
                 <div>
                   <p className="font-black text-white text-base leading-none">Geetha AI</p>
                   <p className="text-cyan-100/70 text-xs mt-1">Government • Scholarships • Guidance</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {voiceSupported && <button onClick={() => { if (speaking) stopSpeaking(); setVoiceOn(v => !v); }} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${voiceOn ? 'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-300/30' : 'bg-white/10 text-white/70'}`} title="Toggle Geetha voice output"><Volume2 size={13} className="inline mr-1" /> {voiceOn ? 'Voice On' : 'Voice Off'}</button>}
-                <button onClick={() => setLowData(v => !v)} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${lowData ? 'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30' : 'bg-white/10 text-white/80'}`} title="Toggle low internet mode">
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                {voiceSupported && <button onClick={() => { if (speaking) stopSpeaking(); setVoiceOn(v => !v); }} className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold ${voiceOn ? 'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-300/30' : 'bg-white/10 text-white/70'}`} title="Toggle Geetha voice output"><Volume2 size={13} className="inline mr-1" /> {voiceOn ? 'Voice On' : 'Voice Off'}</button>}
+                <button onClick={() => setLowData(v => !v)} className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all ${lowData ? 'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30' : 'bg-white/10 text-white/80'}`} title="Toggle low internet mode">
                   <WifiOff size={13} className="inline mr-1" /> {lowData ? 'LOW DATA ON' : 'LOW DATA'}
                 </button>
-                <button onClick={() => setLang(chatLang === 'en' ? 'ta' : 'en')} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium">
+                <button onClick={() => setLang(chatLang === 'en' ? 'ta' : 'en')} className="flex items-center gap-1 px-2 py-1.5 sm:gap-1.5 sm:px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[10px] sm:text-xs font-medium">
                   <Languages size={14} /> {chatLang === 'en' ? 'தமிழ்' : 'English'}
                 </button>
                 <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white" aria-label="Close"><X size={18} /></button>
