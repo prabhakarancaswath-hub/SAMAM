@@ -34,6 +34,12 @@ export interface JobItem {
 }
 
 const STORAGE_KEY = 'samam_gemini_api_key';
+export const SUPPORTED_MODELS = [
+  'gemini-3.5-flash',
+  'gemini-flash-latest',
+  'gemini-3.1-flash-lite',
+  'gemini-3.8-flash'
+];
 
 export function getStoredGeminiKey(): string {
   try {
@@ -168,27 +174,25 @@ export async function testGeminiKey(apiKey: string): Promise<{ success: boolean;
     return { success: false, message: 'Please enter an API key.' };
   }
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey.trim())}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: 'Hello, respond with OK' }] }],
-        generationConfig: { maxOutputTokens: 10 }
-      }),
-    });
+  for (const model of SUPPORTED_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey.trim())}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
+          generationConfig: { maxOutputTokens: 10 }
+        }),
+      });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      const msg = err?.error?.message || `HTTP error ${res.status}`;
-      return { success: false, message: msg };
-    }
-
-    return { success: true, message: 'API key validated successfully!' };
-  } catch (err: any) {
-    return { success: false, message: err?.message || 'Network error reaching Google Gemini API' };
+      if (res.ok) {
+        return { success: true, message: `Connected to Google ${model} successfully!` };
+      }
+    } catch {}
   }
+
+  return { success: false, message: 'Could not connect to Gemini models. Please check your key.' };
 }
 
 export async function askGeminiGeetha(
@@ -209,11 +213,9 @@ export async function askGeminiGeetha(
     parts: [{ text: m.content }],
   }));
 
-  // Fallback chain across fast Gemini free models
-  const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-8b'];
   let lastError = null;
 
-  for (const model of models) {
+  for (const model of SUPPORTED_MODELS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
       const response = await fetch(url, {
@@ -231,23 +233,18 @@ export async function askGeminiGeetha(
         }),
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText && typeof candidateText === 'string' && candidateText.trim()) {
+          return candidateText.trim();
+        }
+      } else {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData?.error?.message || `Gemini API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (candidateText && typeof candidateText === 'string' && candidateText.trim()) {
-        return candidateText.trim();
+        lastError = new Error(errData?.error?.message || `Error ${response.status}`);
       }
     } catch (err: any) {
       lastError = err;
-      // If error is invalid API key, no need to retry other models
-      if (err?.message?.includes('API_KEY_INVALID') || err?.message?.includes('key not valid')) {
-        throw err;
-      }
     }
   }
 
