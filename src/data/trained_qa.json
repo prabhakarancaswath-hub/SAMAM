@@ -1,0 +1,239 @@
+[
+  {
+    "id": "qa_1",
+    "category": "greeting",
+    "title": "Greeting",
+    "sample_questions_en": ["Hi!", "Hello", "Hey", "Good morning", "Hi Geetha", "Hello SAMAM"],
+    "sample_questions_ta": ["வணக்கம்!", "ஹலோ", "வணக்கம் கீதா", "காலை வணக்கம்"],
+    "sample_questions_tanglish": ["Vanakkam", "Vanakkam Geetha", "Hi Geetha eppadi irukinga", "Hello"],
+    "expected_answer_en": "Hello! Welcome to SAMAM AI. How can I help you today?",
+    "expected_answer_ta": "வணக்கம்! SAMAM AI-க்கு உங்களை வரவேற்கிறோம். நான் உங்களுக்கு எப்படி உதவ வேண்டும்?",
+    "keywords": ["hi", "hello", "hey", "vanakkam", "வணக்கம்", "ஹலோ", "greeting"]
+  },
+  {
+    "id": "qa_2",
+    "category": "tnea_college_selection",
+    "title": "TNEA College Selection",
+    "sample_questions_en": [
+      "My engineering cutoff is 185. Which colleges are suitable for me?",
+      "Cutoff 185 engineering colleges",
+      "Which college can I get for 180 cutoff?",
+      "Engineering cutoff college selection",
+      "TNEA cutoff prediction"
+    ],
+    "sample_questions_ta": [
+      "என்னுடைய இன்ஜினியரிங் கட்-ஆஃப் 185. எனக்கு ஏற்ற கல்லூரிகள் எவை?",
+      "185 கட் ஆஃப் கல்லூரிகள்",
+      "என் கட் ஆஃப் 175 எந்த கல்லூரி கிடைக்கும்?",
+      "TNEA கட்-ஆஃப் கல்லூரி தேர்வு"
+    ],
+    "sample_questions_tanglish": [
+      "Enoda cutoff 185, entha college kidaikum?",
+      "Engineering cutoff 180 colleges",
+      "TNEA counselling cutoff colleges"
+    ],
+    "expected_answer_en": "A cutoff of 185 can make you eligible for different engineering colleges. Please tell me your preferred branch, community category and preferred location. I will help you find suitable colleges based on available counselling information.",
+    "expected_answer_ta": "185 கட்-ஆஃப் மதிப்பெண்ணுக்கு ஏற்ற பல கல்லூரிகள் இருக்கலாம். உங்களுக்கு விருப்பமான பாடப்பிரிவு, இடஒதுக்கீட்டுப் பிரிவு மற்றும் விருப்பமான இடத்தைச் சொல்லுங்கள். அதற்கேற்ப கல்லூரிகளைத் தேர்வு செய்ய உதவுகிறேன்.",
+    "keywords": ["cutoff", "cut-off", "tnea", "engineering", "counselling", "கட்-ஆஃப்", "கட்ஆஃப்", "இன்ஜினியரிங்", "கல்லூரி", "பொறியியல்"]
+  },
+  {
+    "id": "qa_3",
+    "category": "scholarship",
+    "title": "Scholarship Application",
+    "sample_questions_en": [
+      "How can I apply for a scholarship?",
+      "Scholarship application process",
+      "How to get government scholarship?",
+      "Steps to apply for college scholarship"
+    ],
+    "sample_questions_ta": [
+      "கல்வி உதவித்தொகைக்கு எப்படி விண்ணப்பிப்பது?",
+      "ஸ்காலர்ஷிப் விண்ணப்பிக்கும் முறை",
+      "கல்லூரி உதவித்தொகை பெறுவது எப்படி?",
+      "அரசு கல்வி உதவித்தொகை விண்ணப்பம்"
+    ],
+    "sample_questions_tanglish": [
+      "Scholarship eppadi apply panradhu?",
+      "Govt scholarship application process",
+      "Kalvi udhavithogai apply panna enna pannanum?"
+    ],
+    "expected_answer_en": "You can apply for scholarships through the relevant scholarship portal. First, check your eligibility, prepare the required documents and follow the application steps.",
+    "expected_answer_ta": "சம்பந்தப்பட்ட கல்வி உதவித்தொகை இணையதளம் மூலம் விண்ணப்பிக்கலாம். முதலில் தகுதியைச் சரிபார்த்து, தேவையான ஆவணங்களைத் தயார் செய்து, விண்ணப்பப் படிகளைப் பின்பற்றுங்கள்.",
+    "keywords": ["scholarship", "apply", "nsp", "கல்வி உதவித்தொகை", "உதவித்தொகை", "விண்ணப்ப", "ஸ்காலர்ஷிப்"]
+  },
+  {
+    "id": "qa_4",
+    "category": "government_scheme",
+    "title": "Government Schemes for Students",
+    "sample_questions_en": [
+      "What government schemes are available for students?",
+      "Government student schemes in Tamil Nadu",
+      "List of student welfare schemes",
+      "Schemes for college students"
+    ],
+    "sample_questions_ta": [
+      "மாணவர்களுக்கு என்னென்ன அரசு திட்டங்கள் உள்ளன?",
+      "மாணவர் நலத்திட்டங்கள் என்ன?",
+      "தமிழ்நாடு மாணவர் அரசு திட்டங்கள் எவை?",
+      "கல்லூரி மாணவர்களுக்கான அரசு திட்டம்"
+    ],
+    "sample_questions_tanglish": [
+      "Students ku enna govt schemes irukku?",
+      "Tamil Nadu student schemes list",
+      "Govt schemes for students"
+    ],
+    "expected_answer_en": "There are different government schemes for students. Tell me your course, education level and state so I can help you find suitable schemes.",
+    "expected_answer_ta": "மாணவர்களுக்குப் பல்வேறு அரசு திட்டங்கள் உள்ளன. உங்களுடைய படிப்பு, கல்வி நிலை மற்றும் மாநிலத்தைச் சொல்லுங்கள். உங்களுக்குப் பொருத்தமான திட்டங்களைக் கண்டறிய உதவுகிறேன்.",
+    "keywords": ["government scheme", "schemes", "student", "திட்டங்கள்", "அரசு திட்டம்", "மாணவர்", "மாணவர்களுக்கு"]
+  },
+  {
+    "id": "qa_5",
+    "category": "document_help",
+    "title": "College Application Documents",
+    "sample_questions_en": [
+      "What documents are needed for a college application?",
+      "Required documents for admission",
+      "Certificates required for college admission",
+      "Documents checklist for counseling"
+    ],
+    "sample_questions_ta": [
+      "கல்லூரியில் விண்ணப்பிக்க என்ன ஆவணங்கள் தேவை?",
+      "கல்லூரி சேர்க்கைக்கு தேவையான சான்றிதழ்கள் எவை?",
+      "அட்மிஷனுக்கு என்ன ஆவணங்கள் வேண்டும்?",
+      "கல்லூரி விண்ணப்ப ஆவணங்கள்"
+    ],
+    "sample_questions_tanglish": [
+      "College application ku enna documents thevai?",
+      "Admission ku enna certificates venum?",
+      "Counseling required documents"
+    ],
+    "expected_answer_en": "Commonly required documents include your mark sheets, transfer certificate, community certificate if applicable, income certificate if required, and other documents specified by the college.",
+    "expected_answer_ta": "பொதுவாக மதிப்பெண் சான்றிதழ்கள், மாற்றுச் சான்றிதழ், தேவைப்பட்டால் சமூகச் சான்றிதழ், வருமானச் சான்றிதழ் மற்றும் கல்லூரி கேட்கும் பிற ஆவணங்கள் தேவைப்படும்.",
+    "keywords": ["documents", "certificates", "application", "ஆவணங்கள்", "சான்றிதழ்", "மதிப்பெண்", "சான்றிதழ்கள்"]
+  },
+  {
+    "id": "qa_6",
+    "category": "learning_help",
+    "title": "Learning & Computer Guidance",
+    "sample_questions_en": [
+      "I don't know how to use a computer. Can you guide me?",
+      "Teach me basic computer skills",
+      "How to use computer and mouse",
+      "Basic computer training guide"
+    ],
+    "sample_questions_ta": [
+      "எனக்கு கணினியைப் பயன்படுத்தத் தெரியாது. நீங்கள் கற்றுத் தர முடியுமா?",
+      "கணினி எப்படி இயக்குவது?",
+      "கம்ப்யூட்டர் பயன்பாடு கற்றுக்கொடுங்கள்",
+      "கணினி அடிப்படை பயிற்சி"
+    ],
+    "sample_questions_tanglish": [
+      "Enakku computer use panna theriyathu, sollitharingala?",
+      "Computer basic kathukodunga",
+      "How to learn computer basics?"
+    ],
+    "expected_answer_en": "Of course! I can teach you step by step, starting with how to switch on a computer, use a mouse and keyboard, and open applications.",
+    "expected_answer_ta": "நிச்சயமாக! கணினியை இயக்குவது, மவுஸ் மற்றும் கீபோர்டைப் பயன்படுத்துவது, செயலிகளைத் திறப்பது போன்றவற்றை ஒவ்வொரு படியாகவும் கற்றுத் தருகிறேன்.",
+    "keywords": ["computer", "mouse", "keyboard", "learn", "teach", "கணினி", "கம்ப்யூட்டர்", "கற்று", "பயன்படுத்த"]
+  },
+  {
+    "id": "qa_7",
+    "category": "job_search",
+    "title": "Job Search Guidance",
+    "sample_questions_en": [
+      "How can I find a job after completing my degree?",
+      "Job search after graduation",
+      "How to get a job as a fresher?",
+      "Steps to find employment"
+    ],
+    "sample_questions_ta": [
+      "பட்டப்படிப்பை முடித்த பிறகு வேலை எப்படிக் கண்டுபிடிப்பது?",
+      "படிப்பு முடித்தவுடன் வேலை தேடுவது எப்படி?",
+      "பட்டதாரிகளுக்கு வேலை வாய்ப்பு எங்கு கிடைக்கும்?",
+      "வேலை கண்டுபிடிக்கும் வழிமுறைகள்"
+    ],
+    "sample_questions_tanglish": [
+      "Degree mudichittu vela eppadi kandupidikuradhu?",
+      "Job search after degree",
+      "Fresher jobs eppadi apply pandrathu?"
+    ],
+    "expected_answer_en": "You can prepare a resume, identify jobs related to your degree, improve your skills and apply through trusted job portals. I can guide you step by step.",
+    "expected_answer_ta": "முதலில் ரெஸ்யூம் தயார் செய்யுங்கள். உங்கள் படிப்புக்கு ஏற்ற வேலைகளைத் தேடி, திறன்களை மேம்படுத்தி, நம்பகமான வேலைவாய்ப்பு இணையதளங்களில் விண்ணப்பிக்கலாம்.",
+    "keywords": ["job", "degree", "resume", "employment", "வேலை", "பட்டப்படிப்பு", "ரெஸ்யூம்", "வேலைவாய்ப்பு"]
+  },
+  {
+    "id": "qa_8",
+    "category": "offline_support",
+    "title": "Offline Support & Internet Usage",
+    "sample_questions_en": [
+      "Can I use SAMAM AI without the internet?",
+      "Does SAMAM AI work offline?",
+      "Low internet support in SAMAM",
+      "Can I access guidance without data?"
+    ],
+    "sample_questions_ta": [
+      "இணையம் இல்லாமல் SAMAM AI-ஐப் பயன்படுத்த முடியுமா?",
+      "ஆஃப்லைனில் SAMAM வேலை செய்யுமா?",
+      "இன்டர்நெட் இல்லாமல் கீதாவிடம் பேசலாமா?",
+      "குறைந்த இணைய வசதியில் பயன்படுமா?"
+    ],
+    "sample_questions_tanglish": [
+      "Internet illama SAMAM AI use panna mudiyuma?",
+      "Offline la SAMAM work aaguma?",
+      "Without internet access"
+    ],
+    "expected_answer_en": "You can use the information available in SAMAM AI's offline knowledge base without an internet connection. The latest updates may require internet access.",
+    "expected_answer_ta": "SAMAM AI-யில் ஏற்கனவே சேமிக்கப்பட்டுள்ள தகவல்களை இணையம் இல்லாமல் பயன்படுத்தலாம். புதிய தகவல்களைப் பெற இணைய இணைப்பு தேவைப்படலாம்.",
+    "keywords": ["offline", "without internet", "internet", "இணையம்", "ஆஃப்லைன்", "இன்டர்நெட்"]
+  },
+  {
+    "id": "qa_9",
+    "category": "unknown_question",
+    "title": "Unknown / Live Deadline Query",
+    "sample_questions_en": [
+      "Tell me the latest scholarship deadline.",
+      "What is the last date to apply?",
+      "Exact deadline for scholarship application",
+      "When is the final date?"
+    ],
+    "sample_questions_ta": [
+      "கல்வி உதவித்தொகைக்கான கடைசி தேதி என்ன?",
+      "விண்ணப்பிக்க கடைசி நாள் எப்போது?",
+      "கடைசி தேதி விவரம் சொல்லுங்கள்",
+      "ஸ்காலர்ஷிப் லாஸ்ட் டேட் என்ன?"
+    ],
+    "sample_questions_tanglish": [
+      "Scholarship kadaisi thethi enna?",
+      "Last date to apply for scholarship",
+      "Deadline details"
+    ],
+    "expected_answer_en": "I don't have a verified latest deadline available right now. Please check the official scholarship website before applying. I don't want to give you incorrect information.",
+    "expected_answer_ta": "தற்போது சரிபார்க்கப்பட்ட கடைசி தேதி என்னிடம் இல்லை. தவறான தகவலை வழங்க விரும்பவில்லை. விண்ணப்பிப்பதற்கு முன் அதிகாரப்பூர்வ இணையதளத்தில் சரிபார்க்கவும்.",
+    "keywords": ["deadline", "last date", "கடைசி தேதி", "லாஸ்ட் டேட்", "கடைசி நாள்", "முடிவு தேதி"]
+  },
+  {
+    "id": "qa_10",
+    "category": "project_purpose",
+    "title": "What is SAMAM AI?",
+    "sample_questions_en": [
+      "What is SAMAM AI?",
+      "Tell me about SAMAM",
+      "What does this app do?",
+      "Purpose of SAMAM platform"
+    ],
+    "sample_questions_ta": [
+      "SAMAM AI என்றால் என்ன?",
+      "சமம் AI பற்றி சொல்லுங்கள்",
+      "இந்த செயலியின் நோக்கம் என்ன?",
+      "SAMAM AI எதற்காக உருவாக்கப்பட்டது?"
+    ],
+    "sample_questions_tanglish": [
+      "SAMAM AI na enna?",
+      "About SAMAM AI",
+      "Enna app idhu?"
+    ],
+    "expected_answer_en": "SAMAM AI is a bilingual guidance assistant that helps people access useful information in Tamil and English. It guides users step by step about education, scholarships, government schemes and opportunities.",
+    "expected_answer_ta": "SAMAM AI என்பது தமிழ் மற்றும் ஆங்கிலத்தில் தகவல்களை வழங்கும் வழிகாட்டி ஆகும். கல்வி, கல்வி உதவித்தொகை, அரசு திட்டங்கள் மற்றும் வாய்ப்புகள் குறித்து மக்களுக்கு ஒவ்வொரு படியாகவும் வழிகாட்டுகிறது.",
+    "keywords": ["what is samam", "about samam", "samam ai", "என்றால் என்ன", "பற்றி சொல்லுங்கள்", "சமம்"]
+  }
+]

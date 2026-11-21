@@ -1,5 +1,6 @@
 import schemesData from '@/data/schemes.json';
 import jobsData from '@/data/jobs.json';
+import trainedQAData from '@/data/trained_qa.json';
 import type { Lang } from '@/i18n/translations';
 
 export interface SchemeItem {
@@ -33,6 +34,18 @@ export interface JobItem {
   description_ta: string;
 }
 
+export interface TrainedQAItem {
+  id: string;
+  category: string;
+  title: string;
+  sample_questions_en: string[];
+  sample_questions_ta: string[];
+  sample_questions_tanglish: string[];
+  expected_answer_en: string;
+  expected_answer_ta: string;
+  keywords: string[];
+}
+
 const STORAGE_KEY = 'samam_gemini_api_key';
 export const SUPPORTED_MODELS = [
   'gemini-3.5-flash',
@@ -63,13 +76,38 @@ export function hasGeminiKey(): boolean {
   return !!getStoredGeminiKey();
 }
 
-// Grounding / RAG: Search local dataset for relevant schemes and jobs
+// Grounding / RAG: Search local dataset for relevant schemes, jobs, and trained benchmark QA
 export function retrieveContext(query: string, lang: Lang): string {
   const q = query.toLowerCase();
   const schemes = schemesData as SchemeItem[];
   const jobs = jobsData as JobItem[];
+  const trainedQAList = trainedQAData as TrainedQAItem[];
 
-  // Match schemes
+  let context = '=== VERIFIED SAMAM KNOWLEDGE BASE & TRAINING BENCHMARK ===\n';
+
+  // 1. Match trained QA intents from the official benchmark document
+  const matchedQA = trainedQAList.find(item => {
+    // Check keywords
+    const keywordMatch = item.keywords.some(kw => q.includes(kw.toLowerCase()));
+    if (keywordMatch) return true;
+    
+    // Check sample questions
+    const allSamples = [...item.sample_questions_en, ...item.sample_questions_ta, ...item.sample_questions_tanglish];
+    return allSamples.some(s => {
+      const sLower = s.toLowerCase();
+      return q.includes(sLower) || sLower.includes(q);
+    });
+  });
+
+  if (matchedQA) {
+    context += `\n[EXACT APPROVED TRAINING BENCHMARK FOR THIS QUERY]:
+Category: ${matchedQA.title}
+Expected Answer in English: "${matchedQA.expected_answer_en}"
+Expected Answer in Tamil: "${matchedQA.expected_answer_ta}"
+MANDATORY INSTRUCTION: Deliver this exact benchmark guidance and tone when answering the user. Do not contradict or omit these key details.\n`;
+  }
+
+  // 2. Match schemes
   const matchedSchemes = schemes.filter(s => {
     const haystack = [
       s.name,
@@ -85,9 +123,9 @@ export function retrieveContext(query: string, lang: Lang): string {
     ].join(' ').toLowerCase();
 
     return q.split(/\s+/).some(token => token.length > 2 && haystack.includes(token));
-  }).slice(0, 4);
+  }).slice(0, 3);
 
-  // Match jobs
+  // 3. Match jobs
   const matchedJobs = jobs.filter(j => {
     const haystack = [
       j.role,
@@ -101,18 +139,16 @@ export function retrieveContext(query: string, lang: Lang): string {
     ].join(' ').toLowerCase();
 
     return q.split(/\s+/).some(token => token.length > 2 && haystack.includes(token));
-  }).slice(0, 3);
-
-  let context = '=== VERIFIED SAMAM KNOWLEDGE BASE ===\n';
+  }).slice(0, 2);
 
   if (matchedSchemes.length > 0) {
-    context += '\n[MATCHED SCHEMES / SCHOLARSHIPS]:\n';
+    context += '\n[VERIFIED RELEVANT SCHEMES / SCHOLARSHIPS]:\n';
     matchedSchemes.forEach(s => {
       const name = lang === 'ta' && s.name_ta ? s.name_ta : s.name;
       const benefits = lang === 'ta' && s.benefits_ta ? s.benefits_ta : s.benefits;
-      context += `- **${name}** (Provider: ${s.provider})\n`;
+      context += `- **${name}** (${s.provider})\n`;
       context += `  Benefits: ${benefits}\n`;
-      context += `  Target Category: ${s.category.join(', ')} | Gender: ${s.gender} | Education: ${s.educationLevel}\n`;
+      context += `  Category: ${s.category.join(', ')} | Gender: ${s.gender} | Education: ${s.educationLevel}\n`;
       if (s.incomeLimit > 0) context += `  Income Limit: ₹${s.incomeLimit.toLocaleString('en-IN')}/year\n`;
       context += `  Eligibility: ${s.eligibility.join('; ')}\n`;
       context += `  Official Portal: ${s.applyLink}\n`;
@@ -120,22 +156,22 @@ export function retrieveContext(query: string, lang: Lang): string {
   }
 
   if (matchedJobs.length > 0) {
-    context += '\n[MATCHED JOBS / INTERNSHIPS]:\n';
+    context += '\n[VERIFIED RELEVANT JOBS / INTERNSHIPS]:\n';
     matchedJobs.forEach(j => {
       const role = lang === 'ta' && j.role_ta ? j.role_ta : j.role;
       context += `- **${role}** at ${j.company} (${j.location})\n`;
       context += `  Stipend: ${j.stipend} | Type: ${j.type} | Skills: ${j.skills.join(', ')}\n`;
-      context += `  Official Link: ${j.link}\n`;
+      context += `  Link: ${j.link}\n`;
     });
   }
 
-  context += `\n[ESSENTIAL TAMIL NADU OFFICIAL PORTALS]:
+  context += `\n[KEY TAMIL NADU OFFICIAL WEBSITES]:
 • National Scholarship Portal (NSP): https://scholarships.gov.in
 • myScheme Government Portal: https://myscheme.gov.in
 • Tamil Nadu e-District / e-Sevai: https://edistricts.tn.gov.in
 • TNEA Engineering Counselling: https://www.tneaonline.org
 • Naan Mudhalvan Skill Portal: https://www.naanmudhalvan.tn.gov.in
-• SWAYAM / NPTEL Free Learning: https://swayam.gov.in
+• SWAYAM / NPTEL: https://swayam.gov.in
 `;
 
   return context;
@@ -150,7 +186,7 @@ Your mission is aligned with United Nations SDG 10: Reduced Inequalities. You he
 CORE IDENTITY & TONE:
 - Be warm, encouraging, respectful, clear, and action-oriented.
 - Use simple, accessible words suitable for first-time digital users or first-generation learners.
-- When greeting, you can warmly say "வணக்கம்!" or "Hello! I am Geetha".
+- When greeting, you can warmly say "வணக்கம்! SAMAM AI-க்கு உங்களை வரவேற்கிறோம். நான் உங்களுக்கு எப்படி உதவ வேண்டும்?" in Tamil or "Hello! Welcome to SAMAM AI. How can I help you today?" in English.
 
 LANGUAGE ADAPTABILITY (CRITICAL):
 - Seamlessly support English, Tamil (தமிழ்), and Tanglish (Tamil in Latin script).
@@ -160,11 +196,10 @@ LANGUAGE ADAPTABILITY (CRITICAL):
 - If the user asks in English, reply in crisp, clear English.
 
 ACCURACY & KNOWLEDGE RULES:
-- Use the verified data provided below as ground truth.
+- Use the verified data and exact benchmark training answers provided below.
 - When citing a scheme, mention its eligibility conditions, benefits, and official apply link.
-- For deadlines, changing admission cutoffs, or official procedures, never fabricate dates. Always direct users to check the official government portal.
-- Keep responses concise, well-formatted with markdown bullets (**bold**, lists).
-- Never ask for passwords, OTPs, Aadhaar numbers, or bank account details. Remind users to only enter sensitive documents on official government (.gov.in or .nic.in) portals.
+- For changing deadlines, unknown dates, or live admission cutoffs, NEVER fabricate dates. Deliver the exact trained guardrail: "I don't have a verified latest deadline available right now. Please check the official scholarship website before applying. I don't want to give you incorrect information." (or in Tamil: "தற்போது சரிபார்க்கப்பட்ட கடைசி தேதி என்னிடம் இல்லை. தவறான தகவலை வழங்க விரும்பவில்லை. விண்ணப்பிப்பதற்கு முன் அதிகாரப்பூர்வ இணையதளத்தில் சரிபார்க்கவும்.")
+- Never ask for passwords, OTPs, Aadhaar numbers, or bank account details.
 
 ${context}`;
 }

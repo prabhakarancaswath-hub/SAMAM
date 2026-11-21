@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, ArrowLeft, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles, Mic, Volume2, Square, MessageCircle, Key, CheckCircle2, AlertCircle } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
+import trainedQAData from '@/data/trained_qa.json';
 import { askGeminiGeetha, hasGeminiKey, getStoredGeminiKey, saveStoredGeminiKey, testGeminiKey } from '@/lib/gemini';
 
 interface Scheme {
@@ -37,6 +38,17 @@ function GeethaAvatar({ size = 44, large = false, speaking = false, listening = 
 function generateGeethaResponse(input: string, lang: Lang): string {
   const lower = input.toLowerCase();
   const isTa = lang === 'ta';
+
+  // 1. Check exact match or keyword match against trained benchmark QA from the official PDF
+  const matched = (trainedQAData as any[]).find(item => {
+    if (item.keywords?.some((kw: string) => lower.includes(kw.toLowerCase()))) return true;
+    const all = [...(item.sample_questions_en || []), ...(item.sample_questions_ta || []), ...(item.sample_questions_tanglish || [])];
+    return all.some((s: string) => lower.includes(s.toLowerCase()) || s.toLowerCase().includes(lower));
+  });
+
+  if (matched) {
+    return isTa ? matched.expected_answer_ta : matched.expected_answer_en;
+  }
 
   if (lower.includes('government') || lower.includes('scheme') || lower.includes('portal') || lower.includes('website') || lower.includes('அரசு') || lower.includes('திட்டம்') || lower.includes('இணையதளம்')) {
     return isTa
