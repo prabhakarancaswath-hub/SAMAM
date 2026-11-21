@@ -10,7 +10,7 @@ Keep answers concise and practical. Never request passwords, OTPs, Aadhaar numbe
 export default async function handler(req: any, res: any) {
   const allowedOrigin = process.env.SAMAM_ALLOWED_ORIGIN;
   const requestOrigin = req.headers.origin;
-  const isLocalOrigin = typeof requestOrigin === 'string' && /^https?:\\/\\/(localhost|127\\.0\\.0\\.1)(:\\d+)?$/.test(requestOrigin);
+  const isLocalOrigin = typeof requestOrigin === 'string' && (requestOrigin === 'http://localhost' || requestOrigin.startsWith('http://localhost:') || requestOrigin === 'http://127.0.0.1' || requestOrigin.startsWith('http://127.0.0.1:') || requestOrigin === 'https://localhost' || requestOrigin.startsWith('https://localhost:') || requestOrigin === 'https://127.0.0.1' || requestOrigin.startsWith('https://127.0.0.1:'));
   if (requestOrigin && allowedOrigin && requestOrigin !== allowedOrigin && !isLocalOrigin) {
     return res.status(403).json({ error: 'Origin not allowed' });
   }
