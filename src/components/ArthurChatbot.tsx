@@ -158,19 +158,43 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     setSpeaking(false);
   }, []);
 
-  const sendMessage = useCallback((text: string) => {
-    if (!text.trim()) return;
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || typing) return;
     const clean = text.trim();
-    setMessages(prev => [...prev, { role: 'user', content: clean }]);
+    const updatedMessages = [...messages, { role: 'user' as const, content: clean }];
+    setMessages(updatedMessages);
     setInput('');
     setTyping(true);
-    setTimeout(() => {
-      const response = generateGeethaResponse(clean, chatLang);
-      setMessages(prev => [...prev, { role: 'arthur', content: response }]);
-      setTyping(false);
-      if (voiceOn) speak(response);
-    }, lowData ? 150 : 450);
-  }, [chatLang, lowData, speak, voiceOn]);
+
+    let response = '';
+    const apiUrl = import.meta.env.VITE_GEETHA_API_URL?.trim();
+    if (apiUrl) {
+      try {
+        const apiMessages = updatedMessages.slice(-12).map(message => ({
+          role: message.role === 'arthur' ? 'assistant' : 'user',
+          content: message.content,
+        }));
+        const result = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: apiMessages, language: chatLang }),
+        });
+        if (!result.ok) throw new Error('Geetha API request failed');
+        const data = await result.json();
+        response = typeof data.answer === 'string' && data.answer.trim()
+          ? data.answer.trim()
+          : generateGeethaResponse(clean, chatLang);
+      } catch {
+        response = generateGeethaResponse(clean, chatLang);
+      }
+    } else {
+      response = generateGeethaResponse(clean, chatLang);
+    }
+
+    setMessages(prev => [...prev, { role: 'arthur', content: response }]);
+    setTyping(false);
+    if (voiceOn) speak(response);
+  }, [chatLang, messages, speak, typing, voiceOn]);
 
   const startListening = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
