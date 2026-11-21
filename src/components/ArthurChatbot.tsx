@@ -4,6 +4,17 @@ import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
 import trainedQAData from '@/data/trained_qa.json';
 import { askGeminiGeetha, hasGeminiKey, getStoredGeminiKey, saveStoredGeminiKey, testGeminiKey } from '@/lib/gemini';
+import {
+  getStoredElevenLabsKey,
+  saveStoredElevenLabsKey,
+  hasElevenLabsKey,
+  getStoredVoiceId,
+  saveStoredVoiceId,
+  ELEVENLABS_VOICES,
+  playElevenLabsSpeech,
+  stopElevenLabsSpeech,
+  testElevenLabsKey,
+} from '@/lib/elevenlabs';
 
 interface Scheme {
   id: string; name: string; name_ta: string; category: string[]; gender: string; incomeLimit: number;
@@ -139,9 +150,17 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   // Gemini API integration state
   const [isGeminiConnected, setIsGeminiConnected] = useState(() => hasGeminiKey());
   const [showKeyModal, setShowKeyModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'gemini' | 'elevenlabs'>('gemini');
   const [apiKeyInput, setApiKeyInput] = useState(() => getStoredGeminiKey());
   const [testingKey, setTestingKey] = useState(false);
   const [testFeedback, setTestFeedback] = useState<{ success: boolean; message: string } | null>(null);
+
+  // ElevenLabs Voice integration state
+  const [isElevenLabsConnected, setIsElevenLabsConnected] = useState(() => hasElevenLabsKey());
+  const [elevenLabsKeyInput, setElevenLabsKeyInput] = useState(() => getStoredElevenLabsKey());
+  const [selectedVoiceId, setSelectedVoiceId] = useState(() => getStoredVoiceId());
+  const [testingVoice, setTestingVoice] = useState(false);
+  const [voiceFeedback, setVoiceFeedback] = useState<{ success: boolean; message: string } | null>(null);
 
   const recognitionRef = useRef<any>(null);
   const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -158,10 +177,14 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     setVoiceSupported(!!SpeechRecognition && 'speechSynthesis' in window);
     setIsGeminiConnected(hasGeminiKey());
+    setIsElevenLabsConnected(hasElevenLabsKey());
   }, []);
 
-  const speak = useCallback((text: string) => {
-    if (!('speechSynthesis' in window)) return;
+  const fallbackSpeak = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) {
+      setSpeaking(false);
+      return;
+    }
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text.replace(/[*#•]/g, ' '));
     utterance.lang = chatLang === 'ta' ? 'ta-IN' : 'en-IN';
@@ -174,7 +197,28 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     window.speechSynthesis.speak(utterance);
   }, [chatLang]);
 
+  const speak = useCallback(async (text: string) => {
+    stopSpeaking();
+    setSpeaking(true);
+
+    // 1. Try ElevenLabs realistic AI voice if connected
+    if (hasElevenLabsKey()) {
+      const played = await playElevenLabsSpeech(text, {
+        onStart: () => setSpeaking(true),
+        onEnd: () => setSpeaking(false),
+        onError: () => {
+          fallbackSpeak(text);
+        },
+      });
+      if (played) return;
+    }
+
+    // 2. Fall back to standard browser speech synthesis
+    fallbackSpeak(text);
+  }, [fallbackSpeak]);
+
   const stopSpeaking = useCallback(() => {
+    stopElevenLabsSpeech();
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     setSpeaking(false);
   }, []);
@@ -356,27 +400,47 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
                 </div>
               </div>
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                {/* Free API Connect / Training Button */}
+                {/* Free AI & Voice Settings Button */}
                 <button
                   type="button"
                   onClick={() => {
                     setApiKeyInput(getStoredGeminiKey());
+                    setElevenLabsKeyInput(getStoredElevenLabsKey());
+                    setSelectedVoiceId(getStoredVoiceId());
                     setTestFeedback(null);
+                    setVoiceFeedback(null);
                     setShowKeyModal(true);
                   }}
                   className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all flex items-center gap-1 ${
-                    isGeminiConnected
+                    isGeminiConnected || isElevenLabsConnected
                       ? 'bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/40 hover:bg-cyan-500/30'
                       : 'bg-white/10 text-white/80 hover:bg-white/20'
                   }`}
-                  title="Connect Free Google Gemini API"
+                  title="Configure Gemini AI & ElevenLabs Voice"
                 >
                   <Sparkles size={12} className={isGeminiConnected ? 'text-cyan-300' : 'text-slate-400'} />
-                  <span className="hidden sm:inline">{isGeminiConnected ? 'Gemini AI Live' : 'Connect Free API'}</span>
-                  <span className="sm:hidden">{isGeminiConnected ? 'Live' : 'API'}</span>
+                  <span className="hidden sm:inline">
+                    {isGeminiConnected && isElevenLabsConnected
+                      ? 'AI + Voice Active'
+                      : isGeminiConnected
+                      ? 'Gemini Live'
+                      : isElevenLabsConnected
+                      ? 'Voice Active'
+                      : 'Connect AI / Voice'}
+                  </span>
+                  <span className="sm:hidden">{isGeminiConnected ? 'AI' : 'Setup'}</span>
                 </button>
 
-                {voiceSupported && <button onClick={() => { if (speaking) stopSpeaking(); setVoiceOn(v => !v); }} className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold ${voiceOn ? 'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-300/30' : 'bg-white/10 text-white/70'}`} title="Toggle Geetha voice output"><Volume2 size={13} className="inline mr-1" /> {voiceOn ? 'Voice On' : 'Voice Off'}</button>}
+                {voiceSupported && (
+                  <button
+                    onClick={() => { if (speaking) stopSpeaking(); setVoiceOn(v => !v); }}
+                    className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold ${voiceOn ? (isElevenLabsConnected ? 'bg-violet-400/20 text-violet-200 ring-1 ring-violet-300/40' : 'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-300/30') : 'bg-white/10 text-white/70'}`}
+                    title={isElevenLabsConnected ? 'ElevenLabs AI Voice Enabled' : 'Browser Web Speech Voice Enabled'}
+                  >
+                    <Volume2 size={13} className="inline mr-1" />
+                    {voiceOn ? (isElevenLabsConnected ? 'ElevenLabs On' : 'Voice On') : 'Voice Off'}
+                  </button>
+                )}
                 
                 <button onClick={() => setLowData(v => !v)} className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all ${lowData ? 'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30' : 'bg-white/10 text-white/80'}`} title="Toggle low internet mode">
                   <WifiOff size={13} className="inline mr-1" /> {lowData ? 'LOW DATA' : 'LOW DATA'}
@@ -392,7 +456,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               <div className="geetha-orbit geetha-orbit-one" />
               <div className="geetha-orbit geetha-orbit-two" />
               <div className="geetha-center-avatar"><GeethaAvatar size={160} large speaking={speaking} listening={listening} /></div>
-              <div className="geetha-status">{listening ? (chatLang === 'ta' ? 'கீதா கேட்கிறார்…' : 'Geetha is listening…') : speaking ? (chatLang === 'ta' ? 'கீதா பேசுகிறார்…' : 'Geetha is speaking…') : (chatLang === 'ta' ? 'கீதாவிடம் பேசுங்கள்' : 'Talk with Geetha')}</div>
+              <div className="geetha-status">{listening ? (chatLang === 'ta' ? 'கீதா கேட்கிறார்…' : 'Geetha is listening…') : speaking ? (isElevenLabsConnected ? (chatLang === 'ta' ? 'கீதா பேசுகிறார் (ElevenLabs AI)…' : 'Geetha speaking (ElevenLabs AI)…') : (chatLang === 'ta' ? 'கீதா பேசுகிறார்…' : 'Geetha is speaking…')) : (chatLang === 'ta' ? 'கீதாவிடம் பேசுங்கள்' : 'Talk with Geetha')}</div>
               <div className="flex items-center justify-center gap-3 mt-3">
                 {voiceSupported && <button onClick={listening ? () => recognitionRef.current?.stop() : startListening} className={`geetha-mic-button ${listening ? 'active' : ''}`} aria-label={listening ? 'Stop listening' : 'Speak to Geetha'}>{listening ? <Square size={20} /> : <Mic size={22} />}</button>}
                 {speaking && <button onClick={stopSpeaking} className="geetha-stop-button" aria-label="Stop Geetha speech"><Square size={17} /></button>}
@@ -442,21 +506,21 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               <button type="submit" disabled={!input.trim()} className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white flex items-center justify-center shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"><Send size={18} /></button>
             </form>
             <div className="px-4 py-2 bg-[#050b19] text-[10px] text-slate-500 flex items-center justify-between">
-              <span>{isGeminiConnected ? '✨ Powered by Google Gemini AI (Grounded)' : lowData ? 'Low-data mode • local guidance' : 'Local guidance • Connect Free API for AI'}</span>
+              <span>{isGeminiConnected ? (isElevenLabsConnected ? '✨ Gemini AI • 🎙️ ElevenLabs Voice' : '✨ Gemini AI Grounded') : lowData ? 'Low-data mode • local guidance' : 'Local guidance • Connect Free API for AI'}</span>
               <span className="inline-flex items-center gap-1"><ExternalLink size={10} /> Verify on official portals</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Free Gemini API Connection & Grounding Setup Modal */}
+      {/* Free Gemini API & ElevenLabs Voice Configuration Modal */}
       {showKeyModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
           <div className="relative w-full max-w-md rounded-2xl bg-[#09152e] border border-cyan-500/30 p-5 text-white shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="text-cyan-400" size={20} />
-                <h3 className="text-base font-bold text-white">Connect Free Gemini AI</h3>
+                <h3 className="text-base font-bold text-white">Geetha AI & Voice Setup</h3>
               </div>
               <button
                 type="button"
@@ -467,81 +531,213 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               </button>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Connect Google's free Gemini API to empower Geetha AI with live conversational reasoning, fluent Tamil/Tanglish/English understanding, and verified grounding in Tamil Nadu scholarships, schemes, and TNEA counselling data.
-            </p>
-
-            <div className="rounded-xl bg-cyan-950/40 border border-cyan-500/20 p-3 text-xs text-cyan-200 space-y-1.5">
-              <div className="font-semibold text-cyan-300 flex items-center gap-1">
-                <span>💡 How to get your free API key (No credit card needed):</span>
-              </div>
-              <ol className="list-decimal list-inside space-y-1 text-slate-300 text-[11px]">
-                <li>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline font-medium inline-flex items-center gap-0.5">Google AI Studio <ExternalLink size={10} /></a></li>
-                <li>Sign in with your Google Account and click <b>"Create API key"</b></li>
-                <li>Copy and paste the key below:</li>
-              </ol>
+            {/* Tab Switcher */}
+            <div className="flex gap-2 border-b border-white/10 pb-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('gemini')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'gemini'
+                    ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/40'
+                    : 'text-slate-400 hover:text-white bg-white/[0.04]'
+                }`}
+              >
+                <Sparkles size={13} className="text-cyan-300" />
+                <span>Google Gemini AI</span>
+                {isGeminiConnected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('elevenlabs')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'elevenlabs'
+                    ? 'bg-violet-500/20 text-violet-200 border border-violet-400/40'
+                    : 'text-slate-400 hover:text-white bg-white/[0.04]'
+                }`}
+              >
+                <Volume2 size={13} className="text-violet-300" />
+                <span>ElevenLabs Voice</span>
+                {isElevenLabsConnected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1" />}
+              </button>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">Google Gemini API Key</label>
-              <input
-                type="password"
-                value={apiKeyInput}
-                onChange={(e) => {
-                  setApiKeyInput(e.target.value);
-                  setTestFeedback(null);
-                }}
-                placeholder="AIzaSy..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-black/40 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
-              />
-            </div>
+            {/* TAB 1: Google Gemini API */}
+            {activeTab === 'gemini' && (
+              <div className="space-y-3.5">
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Powers Geetha with reasoning and multilingual comprehension in Tamil, English, and Tanglish.
+                </p>
 
-            {testFeedback && (
-              <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${testFeedback.success ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-200' : 'bg-rose-950/60 border border-rose-500/30 text-rose-200'}`}>
-                {testFeedback.success ? <CheckCircle2 size={15} className="text-emerald-400 flex-shrink-0" /> : <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />}
-                <span>{testFeedback.message}</span>
+                <div className="rounded-xl bg-cyan-950/40 border border-cyan-500/20 p-3 text-xs text-cyan-200 space-y-1">
+                  <div className="font-semibold text-cyan-300 flex items-center gap-1">
+                    <span>💡 How to get free Gemini key:</span>
+                  </div>
+                  <p className="text-slate-300 text-[11px]">
+                    Create key for free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline font-medium">aistudio.google.com <ExternalLink size={10} className="inline" /></a>
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">Google Gemini API Key</label>
+                  <input
+                    type="password"
+                    value={apiKeyInput}
+                    onChange={(e) => {
+                      setApiKeyInput(e.target.value);
+                      setTestFeedback(null);
+                    }}
+                    placeholder="AIzaSy..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-black/40 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
+                  />
+                </div>
+
+                {testFeedback && (
+                  <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${testFeedback.success ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-200' : 'bg-rose-950/60 border border-rose-500/30 text-rose-200'}`}>
+                    {testFeedback.success ? <CheckCircle2 size={15} className="text-emerald-400 flex-shrink-0" /> : <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />}
+                    <span>{testFeedback.message}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={testingKey || !apiKeyInput.trim()}
+                    onClick={async () => {
+                      setTestingKey(true);
+                      setTestFeedback(null);
+                      const res = await testGeminiKey(apiKeyInput);
+                      setTestingKey(false);
+                      setTestFeedback(res);
+                      if (res.success) {
+                        saveStoredGeminiKey(apiKeyInput);
+                        setIsGeminiConnected(true);
+                        setTimeout(() => setShowKeyModal(false), 800);
+                      }
+                    }}
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 font-bold text-xs text-white shadow-lg disabled:opacity-40 transition-all cursor-pointer"
+                  >
+                    {testingKey ? 'Verifying with Google...' : 'Save Gemini Key'}
+                  </button>
+
+                  {isGeminiConnected && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        saveStoredGeminiKey('');
+                        setApiKeyInput('');
+                        setIsGeminiConnected(false);
+                        setTestFeedback({ success: false, message: 'Gemini Key removed.' });
+                      }}
+                      className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-rose-900/40 text-slate-300 hover:text-rose-200 text-xs font-semibold border border-white/10 cursor-pointer"
+                    >
+                      Disconnect
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                type="button"
-                disabled={testingKey || !apiKeyInput.trim()}
-                onClick={async () => {
-                  setTestingKey(true);
-                  setTestFeedback(null);
-                  const res = await testGeminiKey(apiKeyInput);
-                  setTestingKey(false);
-                  setTestFeedback(res);
-                  if (res.success) {
-                    saveStoredGeminiKey(apiKeyInput);
-                    setIsGeminiConnected(true);
-                    setTimeout(() => setShowKeyModal(false), 800);
-                  }
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 font-bold text-xs text-white shadow-lg disabled:opacity-40 transition-all cursor-pointer"
-              >
-                {testingKey ? 'Verifying with Google...' : 'Save & Connect AI'}
-              </button>
+            {/* TAB 2: ElevenLabs Voice */}
+            {activeTab === 'elevenlabs' && (
+              <div className="space-y-3.5">
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Powers Geetha with natural, ultra-realistic human speech using ElevenLabs (10,000 free characters every month).
+                </p>
 
-              {isGeminiConnected && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    saveStoredGeminiKey('');
-                    setApiKeyInput('');
-                    setIsGeminiConnected(false);
-                    setTestFeedback({ success: false, message: 'API key removed. Reverted to local rule-based guidance.' });
-                  }}
-                  className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-rose-900/40 text-slate-300 hover:text-rose-200 text-xs font-semibold border border-white/10 cursor-pointer"
-                >
-                  Disconnect
-                </button>
-              )}
-            </div>
+                <div className="rounded-xl bg-violet-950/40 border border-violet-500/20 p-3 text-xs text-violet-200 space-y-1">
+                  <div className="font-semibold text-violet-300 flex items-center gap-1">
+                    <span>💡 How to get free ElevenLabs API Key:</span>
+                  </div>
+                  <ol className="list-decimal list-inside space-y-0.5 text-slate-300 text-[11px]">
+                    <li>Sign up free at <a href="https://elevenlabs.io" target="_blank" rel="noopener noreferrer" className="text-violet-300 underline font-medium inline-flex items-center gap-0.5">elevenlabs.io <ExternalLink size={10} /></a></li>
+                    <li>Click your Profile icon (bottom left) &rarr; <b>Profile + API key</b></li>
+                    <li>Copy your API key and paste it below:</li>
+                  </ol>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">ElevenLabs API Key</label>
+                  <input
+                    type="password"
+                    value={elevenLabsKeyInput}
+                    onChange={(e) => {
+                      setElevenLabsKeyInput(e.target.value);
+                      setVoiceFeedback(null);
+                    }}
+                    placeholder="sk_..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-black/40 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-400/40"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">Geetha Voice Persona</label>
+                  <select
+                    value={selectedVoiceId}
+                    onChange={(e) => {
+                      setSelectedVoiceId(e.target.value);
+                      saveStoredVoiceId(e.target.value);
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-[#0b1429] text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-400/40"
+                  >
+                    {ELEVENLABS_VOICES.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {voiceFeedback && (
+                  <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${voiceFeedback.success ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-200' : 'bg-rose-950/60 border border-rose-500/30 text-rose-200'}`}>
+                    {voiceFeedback.success ? <CheckCircle2 size={15} className="text-emerald-400 flex-shrink-0" /> : <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />}
+                    <span>{voiceFeedback.message}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={testingVoice || !elevenLabsKeyInput.trim()}
+                    onClick={async () => {
+                      setTestingVoice(true);
+                      setVoiceFeedback(null);
+                      const res = await testElevenLabsKey(elevenLabsKeyInput);
+                      setTestingVoice(false);
+                      setVoiceFeedback(res);
+                      if (res.success) {
+                        saveStoredElevenLabsKey(elevenLabsKeyInput);
+                        saveStoredVoiceId(selectedVoiceId);
+                        setIsElevenLabsConnected(true);
+                        // Play a brief voice confirmation sample
+                        playElevenLabsSpeech('Hello, I am Geetha AI!');
+                      }
+                    }}
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 font-bold text-xs text-white shadow-lg disabled:opacity-40 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Volume2 size={14} />
+                    {testingVoice ? 'Verifying with ElevenLabs...' : 'Save & Test Voice'}
+                  </button>
+
+                  {isElevenLabsConnected && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        saveStoredElevenLabsKey('');
+                        setElevenLabsKeyInput('');
+                        setIsElevenLabsConnected(false);
+                        setVoiceFeedback({ success: false, message: 'ElevenLabs voice removed. Reverted to standard voice.' });
+                      }}
+                      className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-rose-900/40 text-slate-300 hover:text-rose-200 text-xs font-semibold border border-white/10 cursor-pointer"
+                    >
+                      Disconnect
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
             <p className="text-[10px] text-slate-500 text-center">
-              🔒 Your key is saved locally in your browser storage. It is never committed to GitHub or shared publicly.
+              🔒 Keys are stored securely in browser localStorage only (never committed to GitHub).
             </p>
           </div>
         </div>
