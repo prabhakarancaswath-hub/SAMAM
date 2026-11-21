@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, ArrowLeft, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles, Mic, Volume2, Square, MessageCircle } from 'lucide-react';
+import { X, ArrowLeft, Send, Languages, GraduationCap, Landmark, ClipboardCheck, WifiOff, ExternalLink, ListChecks, Briefcase, BookOpen, Sparkles, Mic, Volume2, Square, MessageCircle, Key, CheckCircle2, AlertCircle } from 'lucide-react';
 import { t, type Lang } from '@/i18n/translations';
 import schemesData from '@/data/schemes.json';
+import { askGeminiGeetha, hasGeminiKey, getStoredGeminiKey, saveStoredGeminiKey, testGeminiKey } from '@/lib/gemini';
 
 interface Scheme {
   id: string; name: string; name_ta: string; category: string[]; gender: string; incomeLimit: number;
@@ -122,12 +123,19 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
+
+  // Gemini API integration state
+  const [isGeminiConnected, setIsGeminiConnected] = useState(() => hasGeminiKey());
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState(() => getStoredGeminiKey());
+  const [testingKey, setTestingKey] = useState(false);
+  const [testFeedback, setTestFeedback] = useState<{ success: boolean; message: string } | null>(null);
+
   const recognitionRef = useRef<any>(null);
   const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const voiceFinalRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastSpokenRef = useRef('');
-
 
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = (val: boolean) => { if (onOpenChange) onOpenChange(val); else setInternalOpen(val); };
@@ -137,6 +145,7 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     try { setLowData(localStorage.getItem('samam-low-data') === '1'); } catch {}
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     setVoiceSupported(!!SpeechRecognition && 'speechSynthesis' in window);
+    setIsGeminiConnected(hasGeminiKey());
   }, []);
 
   const speak = useCallback((text: string) => {
@@ -167,28 +176,48 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     setTyping(true);
 
     let response = '';
-    const apiUrl = import.meta.env.VITE_GEETHA_API_URL?.trim();
-    if (apiUrl) {
+
+    // 1. Try Google Gemini API (with RAG knowledge grounding) if API key is present
+    if (hasGeminiKey()) {
       try {
-        const apiMessages = updatedMessages.slice(-12).map(message => ({
-          role: message.role === 'arthur' ? 'assistant' : 'user',
-          content: message.content,
-        }));
-        const result = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: apiMessages, language: chatLang }),
-        });
-        if (!result.ok) throw new Error('Geetha API request failed');
-        const data = await result.json();
-        response = typeof data.answer === 'string' && data.answer.trim()
-          ? data.answer.trim()
-          : generateGeethaResponse(clean, chatLang);
-      } catch {
-        response = generateGeethaResponse(clean, chatLang);
+        response = await askGeminiGeetha(updatedMessages, clean, chatLang);
+      } catch (err: any) {
+        console.warn('Gemini API call failed, attempting fallback:', err);
+        const errStr = String(err?.message || '');
+        if (errStr.includes('API_KEY_INVALID') || errStr.includes('key not valid')) {
+          response = (chatLang === 'ta')
+            ? `⚠️ Google Gemini API Key தவறானது. அமைப்புகளில் சரியான API Key-ஐ உள்ளிடவும்.\n\n` + generateGeethaResponse(clean, chatLang)
+            : `⚠️ Google Gemini API key seems invalid. Please check your key in settings.\n\n` + generateGeethaResponse(clean, chatLang);
+        } else {
+          response = generateGeethaResponse(clean, chatLang);
+        }
       }
     } else {
-      response = generateGeethaResponse(clean, chatLang);
+      // 2. Try configured proxy URL if available
+      const apiUrl = import.meta.env.VITE_GEETHA_API_URL?.trim();
+      if (apiUrl) {
+        try {
+          const apiMessages = updatedMessages.slice(-12).map(message => ({
+            role: message.role === 'arthur' ? 'assistant' : 'user',
+            content: message.content,
+          }));
+          const result = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: apiMessages, language: chatLang }),
+          });
+          if (!result.ok) throw new Error('Geetha API request failed');
+          const data = await result.json();
+          response = typeof data.answer === 'string' && data.answer.trim()
+            ? data.answer.trim()
+            : generateGeethaResponse(clean, chatLang);
+        } catch {
+          response = generateGeethaResponse(clean, chatLang);
+        }
+      } else {
+        // 3. Fallback to built-in rule-based knowledge engine
+        response = generateGeethaResponse(clean, chatLang);
+      }
     }
 
     setMessages(prev => [...prev, { role: 'arthur', content: response }]);
@@ -267,7 +296,6 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
     return () => document.removeEventListener('open-arthur', handler);
   });
 
-
   const segments = chatLang === 'en'
     ? [
         ['Scholarships', 'scholarship', GraduationCap],
@@ -306,19 +334,40 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
       {open && (
         <div className={`fixed inset-0 z-[100] flex items-stretch justify-stretch bg-[#071025] ${lowData ? 'low-data-mode' : ''}`} style={{ height: '100dvh', width: '100vw' }}>
           <div className="flex flex-col bg-[#071025] text-white rounded-none shadow-none border-0 overflow-hidden w-full max-w-none min-h-0" style={{ height: '100dvh', minHeight: '100dvh' }}>
-            <div className="flex items-center justify-between bg-gradient-to-r from-[#080d24] via-[#25105d] to-[#063d55] px-4 py-3.5 flex-shrink-0">
+            <div className="flex items-center justify-between bg-gradient-to-r from-[#080d24] via-[#25105d] to-[#063d55] px-4 py-3 flex-shrink-0">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <button onClick={() => setOpen(false)} className="flex-shrink-0 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white" aria-label={chatLang === 'ta' ? 'பின்செல்' : 'Go back'} title={chatLang === 'ta' ? 'பின்செல்' : 'Go back'}><ArrowLeft size={20} /></button>
-                <GeethaAvatar size={48} large speaking={speaking} listening={listening} />
+                <GeethaAvatar size={44} large speaking={speaking} listening={listening} />
                 <div>
                   <p className="font-black text-white text-base leading-none">Geetha AI</p>
                   <p className="text-cyan-100/70 text-xs mt-1">Government • Scholarships • Guidance</p>
                 </div>
               </div>
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                {/* Free API Connect / Training Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setApiKeyInput(getStoredGeminiKey());
+                    setTestFeedback(null);
+                    setShowKeyModal(true);
+                  }}
+                  className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all flex items-center gap-1 ${
+                    isGeminiConnected
+                      ? 'bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/40 hover:bg-cyan-500/30'
+                      : 'bg-white/10 text-white/80 hover:bg-white/20'
+                  }`}
+                  title="Connect Free Google Gemini API"
+                >
+                  <Sparkles size={12} className={isGeminiConnected ? 'text-cyan-300' : 'text-slate-400'} />
+                  <span className="hidden sm:inline">{isGeminiConnected ? 'Gemini AI Live' : 'Connect Free API'}</span>
+                  <span className="sm:hidden">{isGeminiConnected ? 'Live' : 'API'}</span>
+                </button>
+
                 {voiceSupported && <button onClick={() => { if (speaking) stopSpeaking(); setVoiceOn(v => !v); }} className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold ${voiceOn ? 'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-300/30' : 'bg-white/10 text-white/70'}`} title="Toggle Geetha voice output"><Volume2 size={13} className="inline mr-1" /> {voiceOn ? 'Voice On' : 'Voice Off'}</button>}
+                
                 <button onClick={() => setLowData(v => !v)} className={`px-2 py-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all ${lowData ? 'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30' : 'bg-white/10 text-white/80'}`} title="Toggle low internet mode">
-                  <WifiOff size={13} className="inline mr-1" /> {lowData ? 'LOW DATA ON' : 'LOW DATA'}
+                  <WifiOff size={13} className="inline mr-1" /> {lowData ? 'LOW DATA' : 'LOW DATA'}
                 </button>
                 <button onClick={() => setLang(chatLang === 'en' ? 'ta' : 'en')} className="flex items-center gap-1 px-2 py-1.5 sm:gap-1.5 sm:px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[10px] sm:text-xs font-medium">
                   <Languages size={14} /> {chatLang === 'en' ? 'தமிழ்' : 'English'}
@@ -328,18 +377,18 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
             </div>
 
             {messages.length <= 1 && <div className="geetha-center-stage">
-  <div className="geetha-orbit geetha-orbit-one" />
-  <div className="geetha-orbit geetha-orbit-two" />
-  <div className="geetha-center-avatar"><GeethaAvatar size={170} large speaking={speaking} listening={listening} /></div>
-  <div className="geetha-status">{listening ? (chatLang === 'ta' ? 'கீதா கேட்கிறார்…' : 'Geetha is listening…') : speaking ? (chatLang === 'ta' ? 'கீதா பேசுகிறார்…' : 'Geetha is speaking…') : (chatLang === 'ta' ? 'கீதாவிடம் பேசுங்கள்' : 'Talk with Geetha')}</div>
-  <div className="flex items-center justify-center gap-3 mt-3">
-    {voiceSupported && <button onClick={listening ? () => recognitionRef.current?.stop() : startListening} className={`geetha-mic-button ${listening ? 'active' : ''}`} aria-label={listening ? 'Stop listening' : 'Speak to Geetha'}>{listening ? <Square size={20} /> : <Mic size={22} />}</button>}
-    {speaking && <button onClick={stopSpeaking} className="geetha-stop-button" aria-label="Stop Geetha speech"><Square size={17} /></button>}
-  </div>
-  {!voiceSupported && <p className="text-[11px] text-slate-500 mt-2">{t(chatLang, 'voiceUnsupported')}</p>}
-</div>}
+              <div className="geetha-orbit geetha-orbit-one" />
+              <div className="geetha-orbit geetha-orbit-two" />
+              <div className="geetha-center-avatar"><GeethaAvatar size={160} large speaking={speaking} listening={listening} /></div>
+              <div className="geetha-status">{listening ? (chatLang === 'ta' ? 'கீதா கேட்கிறார்…' : 'Geetha is listening…') : speaking ? (chatLang === 'ta' ? 'கீதா பேசுகிறார்…' : 'Geetha is speaking…') : (chatLang === 'ta' ? 'கீதாவிடம் பேசுங்கள்' : 'Talk with Geetha')}</div>
+              <div className="flex items-center justify-center gap-3 mt-3">
+                {voiceSupported && <button onClick={listening ? () => recognitionRef.current?.stop() : startListening} className={`geetha-mic-button ${listening ? 'active' : ''}`} aria-label={listening ? 'Stop listening' : 'Speak to Geetha'}>{listening ? <Square size={20} /> : <Mic size={22} />}</button>}
+                {speaking && <button onClick={stopSpeaking} className="geetha-stop-button" aria-label="Stop Geetha speech"><Square size={17} /></button>}
+              </div>
+              {!voiceSupported && <p className="text-[11px] text-slate-500 mt-2">{t(chatLang, 'voiceUnsupported')}</p>}
+            </div>}
 
-<div className="px-4 pt-3 pb-2 bg-[#08142b] border-b border-white/10">
+            <div className="px-4 pt-3 pb-2 bg-[#08142b] border-b border-white/10">
               <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                 {segments.map(([label, prompt, Icon]) => (
                   <button key={label} onClick={() => sendMessage(prompt)} className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[.05] ring-1 ring-white/10 hover:bg-cyan-400/10 hover:ring-cyan-300/30 text-xs font-semibold text-slate-200 transition-all">
@@ -381,16 +430,113 @@ export function GeethaChatbot({ lang, setLang, open: externalOpen, onOpenChange 
               <button type="submit" disabled={!input.trim()} className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white flex items-center justify-center shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"><Send size={18} /></button>
             </form>
             <div className="px-4 py-2 bg-[#050b19] text-[10px] text-slate-500 flex items-center justify-between">
-              <span>{lowData ? 'Low-data mode • local guidance' : 'Local guidance • no account required'}</span>
+              <span>{isGeminiConnected ? '✨ Powered by Google Gemini AI (Grounded)' : lowData ? 'Low-data mode • local guidance' : 'Local guidance • Connect Free API for AI'}</span>
               <span className="inline-flex items-center gap-1"><ExternalLink size={10} /> Verify on official portals</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Free Gemini API Connection & Grounding Setup Modal */}
+      {showKeyModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-md rounded-2xl bg-[#09152e] border border-cyan-500/30 p-5 text-white shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-cyan-400" size={20} />
+                <h3 className="text-base font-bold text-white">Connect Free Gemini AI</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowKeyModal(false)}
+                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Connect Google's free Gemini API to empower Geetha AI with live conversational reasoning, fluent Tamil/Tanglish/English understanding, and verified grounding in Tamil Nadu scholarships, schemes, and TNEA counselling data.
+            </p>
+
+            <div className="rounded-xl bg-cyan-950/40 border border-cyan-500/20 p-3 text-xs text-cyan-200 space-y-1.5">
+              <div className="font-semibold text-cyan-300 flex items-center gap-1">
+                <span>💡 How to get your free API key (No credit card needed):</span>
+              </div>
+              <ol className="list-decimal list-inside space-y-1 text-slate-300 text-[11px]">
+                <li>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline font-medium inline-flex items-center gap-0.5">Google AI Studio <ExternalLink size={10} /></a></li>
+                <li>Sign in with your Google Account and click <b>"Create API key"</b></li>
+                <li>Copy and paste the key below:</li>
+              </ol>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Google Gemini API Key</label>
+              <input
+                type="password"
+                value={apiKeyInput}
+                onChange={(e) => {
+                  setApiKeyInput(e.target.value);
+                  setTestFeedback(null);
+                }}
+                placeholder="AIzaSy..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-black/40 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
+              />
+            </div>
+
+            {testFeedback && (
+              <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${testFeedback.success ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-200' : 'bg-rose-950/60 border border-rose-500/30 text-rose-200'}`}>
+                {testFeedback.success ? <CheckCircle2 size={15} className="text-emerald-400 flex-shrink-0" /> : <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />}
+                <span>{testFeedback.message}</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                disabled={testingKey || !apiKeyInput.trim()}
+                onClick={async () => {
+                  setTestingKey(true);
+                  setTestFeedback(null);
+                  const res = await testGeminiKey(apiKeyInput);
+                  setTestingKey(false);
+                  setTestFeedback(res);
+                  if (res.success) {
+                    saveStoredGeminiKey(apiKeyInput);
+                    setIsGeminiConnected(true);
+                    setTimeout(() => setShowKeyModal(false), 800);
+                  }
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 font-bold text-xs text-white shadow-lg disabled:opacity-40 transition-all cursor-pointer"
+              >
+                {testingKey ? 'Verifying with Google...' : 'Save & Connect AI'}
+              </button>
+
+              {isGeminiConnected && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveStoredGeminiKey('');
+                    setApiKeyInput('');
+                    setIsGeminiConnected(false);
+                    setTestFeedback({ success: false, message: 'API key removed. Reverted to local rule-based guidance.' });
+                  }}
+                  className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-rose-900/40 text-slate-300 hover:text-rose-200 text-xs font-semibold border border-white/10 cursor-pointer"
+                >
+                  Disconnect
+                </button>
+              )}
+            </div>
+
+            <p className="text-[10px] text-slate-500 text-center">
+              🔒 Your key is saved locally in your browser storage. It is never committed to GitHub or shared publicly.
+            </p>
           </div>
         </div>
       )}
     </>
   );
 }
-
 
 // Backward-compatible export used by App.tsx
 export const ArthurChatbot = GeethaChatbot;

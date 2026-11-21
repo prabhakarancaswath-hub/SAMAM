@@ -1,25 +1,50 @@
-# Geetha AI secure API setup
+# Geetha AI — Free API Integration & Training Guide
 
-This branch adds a server-side proxy at `api/geetha-chat.ts`. It keeps the provider token out of the browser and public frontend bundle.
+This guide explains how Geetha AI connects to free AI providers (such as Google Gemini Flash) and how her knowledge training/grounding works.
 
-## Server-only environment variables
+## 1. Free AI Engine (Google Gemini 1.5 Flash)
 
-Set these in your backend hosting dashboard (not in public GitHub files):
+Geetha AI is powered by Google Gemini 1.5 Flash (free tier: 15 requests/minute, 1,500 requests/day, zero credit card required):
+- **Multilingual Mastery**: Native support for **Tamil (தமிழ்)**, **English**, and **Tanglish** (Tamil written in Latin script).
+- **Zero-cost**: Free for hackathons, testing, and community deployments.
 
-- `OLLAMA_API_KEY`: the private provider token
-- `OLLAMA_MODEL`: model name (defaults to `deepseek-v4.1-flash`)
-- `SAMAM_ALLOWED_ORIGIN`: the exact origin of the SAMAM frontend
+### How Users Connect Their Key in the Web App
+1. Get a free API key at [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. Open SAMAM and tap **Ask Geetha AI**.
+3. In the top bar, click **"✨ Connect Free API"**.
+4. Paste your API key and click **Save & Connect AI**.
+5. The key is stored locally in the user's browser `localStorage` and is never exposed in the public Git repository.
 
-## Frontend variable
+---
 
-- `VITE_GEETHA_API_URL`: full HTTPS URL to the deployed endpoint `/api/geetha-chat`. This value is public and must not contain secrets.
+## 2. How Geetha is "Trained" (RAG Grounding)
 
-If this variable is blank or the API request fails, Geetha falls back to her existing local response logic.
+Instead of slow and costly model fine-tuning, Geetha utilizes **Retrieval-Augmented Generation (RAG) & Dynamic Knowledge Grounding**:
 
-## Notes
+1. **Context Extraction**:
+   When a user submits a query (e.g. *"BC engineering scholarship in Tamil Nadu"*), `retrieveContext()` automatically queries:
+   - `src/data/schemes.json` (31+ Tamil Nadu & National scholarships)
+   - `src/data/colleges.json` / `colleges.csv` (TNEA college cutoffs & counselling flow)
+   - `src/data/jobs.json` (Curated local jobs & internships)
+   - Official Tamil Nadu portals (`scholarships.gov.in`, `tneaonline.org`, `myscheme.gov.in`, etc.)
 
-- Never commit real tokens, `.env` files, or private credentials.
-- Rotate any token pasted into chats or committed to a repository.
-- This endpoint is intended for Vercel deployment. GitHub Pages alone cannot execute the serverless `api/` route.
-- Provider free-tier limits, model availability, and costs can change. Verify them before using.
-- The endpoint limits message count and content size and returns generic upstream errors to avoid leaking provider details.
+2. **System Instruction & Guardrails**:
+   Geetha is trained with the system persona in `src/lib/gemini.ts`:
+   - Warm, encouraging, empathetic female persona aligned with **UN SDG 10 (Reduced Inequalities)**.
+   - Always provides exact eligibility criteria, income caps, and official application links.
+   - Strict rule against hallucinating changing dates or deadlines; refers to official portals.
+   - Safety guardrail: Never asks for Aadhaar numbers, OTPs, or passwords.
+
+3. **Graceful Fallbacks**:
+   - If an API key is connected &rarr; Uses Gemini AI with grounded context.
+   - If offline or no key &rarr; Falls back seamlessly to built-in rule-based knowledge engine.
+
+---
+
+## 3. Serverless Proxy Deployment (Optional for Vercel)
+
+If you prefer to deploy a backend proxy on Vercel so users do not need to enter their own key:
+- Add server-side environment variables in your Vercel Dashboard:
+  - `GEMINI_API_KEY`: Your private Google Gemini key
+  - `SAMAM_ALLOWED_ORIGIN`: `https://prabhakarancaswath-hub.github.io`
+- Set `VITE_GEETHA_API_URL` in your frontend environment.
